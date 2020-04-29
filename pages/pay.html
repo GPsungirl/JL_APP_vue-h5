@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>贝壳充值</title>
+    <link rel="stylesheet" href="../css/reset.css">
+    <link rel="stylesheet" href="../css/common.css">    
+    <!-- vant ui -->
+    <link rel="stylesheet" href="../css/vant.css">
+    <style>
+        [v-cloak] {
+            display: none !important;
+        }
+        .van-loading{
+            position: fixed;
+            top: 50%;
+            margin-top: -38px;
+            left: 0;
+            right: 0;
+            z-index:1000;
+        }
+        .van-loading__text{
+            color:#1989fa;
+        }
+        .van-overlay{
+            background-color:rgba(255,255,255,.7);
+        }
+    </style>
+</head>
+
+<body>
+    
+    <div id="pay" v-cloak>
+        
+        <!-- 顶部 -->
+        <div class="pay_gradient pay_shell ">
+            <div class="yue">账户余额</div>
+            <div>
+                <span class="account_no">{{ account_no }}</span>
+                <span class="font12">贝壳</span>
+            </div>
+        </div>
+        <!-- 充值 -->
+        <div class="recharge pad_15 pay_item" style="padding-bottom:0px">
+            <h5>请选择充值金额</h5>
+            <div class="pi_content">
+                <div>
+                    <div v-for="(item,index) in rechargeNum" 
+                        :key="index" 
+                        @click="selectMoney(index)" 
+                        :class="{selected:index === curIndex}"
+                        >
+                        <p class="p_shell">{{ item.shell }}</p>
+                        <p class="p_money">￥{{ item.money }}</p>
+                    </div>                                   
+                    <div @click="selectOther"
+                         
+                         :class="{selected:moneyIsSelect}">
+                        <!-- <p class="otherNum">其他数量</p>   -->
+                        <input 
+                            :type="inpu_type" 
+                            @input="writeM"
+                            
+                            @blur="otherNumBlur"
+                            v-model="otherNum" class="otherNum">  
+                        <p class="txt_js">（10的倍数）</p>                    
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 支付 -->
+        <div class="payment pad_15 pay_item" style="padding-top:4px;">
+            <h5>请选择支付方式</h5>
+            <div class="pay_type">
+                <div v-for="(item, index) in payOrigin"
+                    @click="handlePaytype(index)"
+                    :class="{paySelected:index === payIndex}"
+                    :key="index">
+                    <img :src="item.imgUrl" alt="">
+                    <p class="txt_descri">{{ item.txt }}</p>
+                </div>                
+            </div>
+            <p class="pay_txt">充值成功后，到账可能会有一定延迟，请您耐心等待。</p>
+        </div>
+        <!-- 底部支付 -->
+        <div class="footer_pay">
+            <p class="showM">{{ payData.money }}</p>
+            <van-button class="f_pay gradient" @click="goPay" type="default">立即支付</van-button>
+
+            
+        </div>
+        
+        <!-- 加载中 -->
+        <van-loading v-show="showVisible" color="#1989fa" type="spinner" size="48px" vertical>加载中...</van-loading>
+        <van-overlay :show="showVisible"  ></van-overlay>
+        <!-- 提示 -->
+        <van-dialog id="van-dialog" ></van-dialog>
+    </div>
+    
+    <script src="../js/rem.js"></script>
+    <script src="../js/jquery.js"></script>
+    <script src="../js/vue.js"></script>
+    <script src="../js/utils.js"></script>
+    <!-- vant -->
+    <script src="../js/vant.js"></script>
+    <script src="../js/common.js"></script>
+    <script>
+        if (!window.Promise) {
+            document.write(
+                '<script src="//cdn.jsdelivr.net/npm/es6-promise@4.1.1/dist/es6-promise.min.js"><\/script><script>ES6Promise.polyfill()<\/script>'
+            )
+        }
+    </script>
+    <script>
+        let vm = new Vue({
+            el: '#pay',
+            data: {
+                account_no:1000,
+                showVisible:false,
+                // 当前选中的index
+                curIndex:0,
+                payIndex:-1,
+                rechargeNum:[
+                    {
+                        shell:'60贝壳',
+                        money:'6.00'
+                    },
+                    {
+                        shell:'300贝壳',
+                        money:'30.00'
+                    },
+                    {
+                        shell:'980贝壳',
+                        money:'98.00'
+                    },
+                    {
+                        shell:'1880贝壳',
+                        money:'188.00'
+                    },
+                    {
+                        shell:'3280贝壳',
+                        money:'328.00'
+                    }
+                    
+                ],
+                // 支付方式
+                payOrigin:[
+                    
+                    // {
+                    //     imgUrl:'img/alipay.png',
+                    //     txt:'支付宝支付'
+                    // },
+                    {
+                        imgUrl:'../img/wechatPay.png',
+                        txt:'微信支付'
+                    },
+                ],
+                // 其他数量
+                otherNum:'其他数量',
+                inpu_type:'text',
+                // 是否选中 充值金额
+                shellIsSelect:false,
+                moneyIsSelect:false,
+                // 是否选中 支付方式
+                payIsSelect: false,
+
+                // 收集数据
+                payData:{
+                    // 充值金额
+                    money:'',
+                    // 支付方式 0支付宝 1微信
+                    payType:'',
+                },
+                
+
+            },
+            created(){
+                // 获取url参数
+                this.account_no = getMoney();
+                // 初始化 money                
+                this.payData.money = '￥'+ this.rechargeNum[0].money
+            },
+            methods:{
+                // 选择具体数量
+                selectMoney(p){
+                    this.curIndex = p;
+                    this.moneyIsSelect = false;
+                    
+                    this.inpu_type = 'text';
+                    this.otherNum = '其他数量';
+                    // 获取数据
+                    this.payData.money = '￥'+ this.rechargeNum[p].money
+                    
+                   
+                },
+                // 选择其他
+                selectOther(e){
+                    // 确保所有都没选中
+                    this.curIndex = -1;
+                    this.moneyIsSelect = true;
+                    this.inpu_type = 'number';
+                    // 金额
+                    this.payData.money = ''
+                },
+                // 输入其他数量 失去焦点
+                otherNumBlur(){
+                    //this.payData.money =  this.otherNum / 10;
+                    
+                },
+                writeM(e){
+                    if(e.target.value % 10 == 0){
+                        this.payData.money = '￥'+ (e.target.value / 10) +'.00'
+                    }else{
+                        this.payData.money = '￥'+ (e.target.value / 10) 
+                    }                                        
+                },
+                // 支付方式
+                handlePaytype(i){
+                    this.payIndex = this.payData.payType= i;
+                                        
+                },
+                // 立即支付
+                goPay(){
+                    let copayMoney =  Number(this.payData.money.slice(1));                    
+                    // 判断 支付方式                     
+                    if(this.payData.payType === ''){   
+
+                        this.$toast('请选择支付方式');                       
+                        return
+                    }
+                    // GP
+                    // 金额大于1元
+                    if(typeof copayMoney != 'number' || copayMoney < 1){
+                        this.$toast('充值金额最少10贝壳');                       
+                        return
+                    }
+                    // 判断 金额是否符合格式 (整数 )
+                    if(typeof copayMoney != 'number' || copayMoney %1 != 0){
+                        this.$toast('充值金额必须为10的整数倍');                       
+                        return
+                    }
+
+                    // 调用支付
+                    if(copayMoney == 0){
+                        this.$toast('大哥，选择金额好不好');                       
+                        return
+                    }
+                    // console.log(copayMoney*100) 
+                    // console.log(this.payData.payType+1)
+                    let param = {
+                        header_token:'0d424657c96f43d395721f1bdbf9cec8',
+                        url: payUlr + '/api/account/rechargeVirtual',
+                        data: {
+                            money:copayMoney*100,
+                            payType:this.payData.payType+1
+                        }
+                    }
+                    console.log(param)
+                    //this.showVisible = true
+                    
+                    // myAjax(param).then(res=>{
+                        
+                    //     if(res.code == '0000'){
+                    //         this.showVisible = false                                                        
+                    //         window.location.href = res.data.payRequest                                                                                                          
+                    //     }
+                        
+                    // }).catch(err=>{
+                    //     console.log(err)
+                    // })
+
+                },
+                
+            }
+        })
+    </script>
+</body>
+
+</html>

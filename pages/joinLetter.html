@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>致代理商一封信</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/common.css">
+</head>
+
+<body>
+    <div class="main_content">
+        <!-- 顶部banner -->
+        <div class="letter_img"><img src="img/letterbanner.png" alt=""></div>
+        <!-- 主体内容 -->
+        <div class="letter_content">
+            <h5 class="l_title2 title1">
+                Hi您好：
+            </h5>
+
+            <p class="l_title3 title3">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;自角落里平台上线伊始，
+                便坚持严格人工审核角落向导，角落向导的主要组成人员为在校大学生
+                ，其优质的服务获得广大用户的认可，更有异地用户咨询当地服务何时开
+                通。鉴于角落里平台不仅仅是一个可盈利平台，更是极大的促进了文明出
+                行，提高了出行质量。所以我们决定对境内全部地级市进行招商，境外暂对
+                东南亚各国家招商。
+            </p>
+            <h5 class="l_title2 title1 red_con">
+                招商要求：
+            </h5>
+            <div class="red_con">
+                <p class="letter_list l_title2 color_red">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;·您需要有一间独立的公司</p>
+                <p class="letter_list l_title2 color_red">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;·您需要对文明出行服务有一定理解</p>
+                <p class="letter_list l_title2 color_red">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;·具备正向引导的能力</p>
+                <p class="letter_list l_title2 color_red">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;·具备市场运营管理的能力</p>
+            </div>
+            <p class="l_title3 title3">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;如果您已经做好了准备，请联系我们
+                ，我们为您准备了成熟的校园招募方案以及市场推广方案。
+            </p>
+            <div class="red_con">
+                <p class="l_title3 title3">
+                    联系方式
+                </p>
+                <div class="red_con">
+                    <p class="l_title3 title3 lineh_h">电话：0532-88903698</p>
+                    <p class="l_title3 title3 lineh_h">微信：17561681223</p>
+                    <p class="l_title3 title3 lineh_h txt_r">角落里</p>
+                </div>
+
+            </div>
+
+
+            <div id="confirm_btn" class="confirm_btn join_gradient l_title2">
+                立即加入
+            </div>
+        </div>
+    </div>
+    <script src="js/rem.js"></script>
+    <script>
+        // 立即加入 跳往电话
+        window.onload = function () {
+            // 这里根据移动端原生的 userAgent 来判断当前是 Android 还是 ios
+            var u = navigator.userAgent;
+            // Android终端
+            var isAndroid = u.indexOf('Android') > -1 || u.indexOf('Adr') > -1;
+            // IOS 终端
+            var isIOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
+
+
+            var confirm_btn = document.getElementById('confirm_btn');
+            confirm_btn.addEventListener('click', function () {
+                if (isAndroid) {
+                    App.chooseDate('dialnumber');
+                } else if (isIOS) {
+                    appJs.clickDetermine('dialnumber');
+                }
+
+            })
+        }
+    </script>
+</body>
+
+</html>

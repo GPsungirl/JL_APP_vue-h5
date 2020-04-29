@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>pay_2</title>
+    <link rel="stylesheet" href="../css/reset.css">
+    <link rel="stylesheet" href="../css/common.css">    
+    <!-- vant ui -->
+    <link rel="stylesheet" href="../css/vant.css">
+    <style>
+        [v-cloak] {
+            display: none !important;
+        }
+        .van-loading{
+            position: fixed;
+            top: 50%;
+            margin-top: -38px;
+            left: 0;
+            right: 0;
+            z-index:1000;
+        }
+        .van-loading__text{
+            color:#1989fa;
+        }
+        .van-overlay{
+            background-color:rgba(255,255,255,.7);
+        }
+        .pay_2{
+            background-color: #F9F9F9;
+        }
+    </style>
+</head>
+
+<body>
+    
+    <div id="pay_2" v-cloak>
+        
+        <!-- 顶部 -->
+        <div class="pay_2">
+            <span class="font12 f12_tip" >请在15分钟内完成支付</span>
+            <span>{{ payData.money }}</span>
+            
+        </div>
+        <!-- 支付 -->
+        <div class="payment pad_15 pay_item" >
+            <h5>请选择支付方式</h5>
+            <div class="pay_type">
+                <div v-for="(item, index) in payOrigin"
+                    @click="handlePaytype(index)"
+                    :class="{paySelected:index === payIndex}"
+                    :key="index">
+                    <img :src="item.imgUrl" alt="">
+                    <p class="txt_descri">{{ item.txt }}</p>
+                </div>                
+            </div>
+            <p class="pay_txt">充值成功后，到账可能会有一定延迟，请您耐心等待。</p>
+        </div>
+        <!-- 底部支付 -->
+        <div class="footer_pay">
+            <!-- <p class="showM">{{ payData.money }}</p> -->
+            <van-button class="f_pay gradient" @click="goPay" type="default">立即支付</van-button>            
+        </div>
+        
+        <!-- 加载中 -->
+        <van-loading v-show="showVisible" color="#1989fa" type="spinner" size="48px" vertical>加载中...</van-loading>
+        <van-overlay :show="showVisible"  ></van-overlay>
+        <!-- 提示 -->
+        <van-dialog id="van-dialog" ></van-dialog>
+    </div>
+    
+    <script src="../js/rem.js"></script>
+    <script src="../js/jquery.js"></script>
+    <script src="../js/vue.js"></script>
+    <script src="../js/utils.js"></script>
+    <!-- vant -->
+    <script src="../js/vant.js"></script>
+    <script src="../js/common.js"></script>
+    <script>
+        if (!window.Promise) {
+            document.write(
+                '<script src="//cdn.jsdelivr.net/npm/es6-promise@4.1.1/dist/es6-promise.min.js"><\/script><script>ES6Promise.polyfill()<\/script>'
+            )
+        }
+    </script>
+    <script>
+        let vm = new Vue({
+            el: '#pay_2',
+            data: {
+                
+                showVisible:false,
+                // 当前选中的index
+                curIndex:0,
+                payIndex:-1,
+                
+                // 支付方式
+                payOrigin:[
+                    
+                    {
+                        imgUrl:'../img/alipay.png',
+                        txt:'支付宝支付'
+                    },
+                    {
+                        imgUrl:'../img/wechatPay.png',
+                        txt:'微信支付'
+                    },
+                ],
+                // 其他数量
+                otherNum:'其他数量',
+                inpu_type:'text',
+                // 是否选中 充值金额
+                shellIsSelect:false,
+                moneyIsSelect:false,
+                // 是否选中 支付方式
+                payIsSelect: false,
+                _param:'',
+                // 收集数据
+                payData:{
+                    // 充值金额
+                    money:'',
+                    // 支付方式 0支付宝 1微信
+                    payType:'',
+                },
+                
+
+            },
+            created(){
+                // 初始化数据
+                this._param = getPayMoney()
+                // 赋值金额
+                this.payData.money = '￥' + this._param.allPices
+            },
+            methods:{                                               
+                // 支付方式
+                handlePaytype(i){
+                    this.payIndex = this.payData.payType= i;                                        
+                },
+                // 立即支付
+                goPay(){
+                                        
+                    // 判断 支付方式                     
+                    if(this.payData.payType === ''){   
+                        
+                        this.$toast('请选择支付方式');                       
+                        return
+                    }
+                                     
+                    let param = {
+                        header_token:this._param.token,
+                        url: payUlr + '/api/customOrder/payCustomOrderRequest',
+                        data: {
+                            allOrderids:this._param.allOrderids,
+                            allPices:this._param.allPices,
+                            payType:this.payData.payType+1,
+                            travelerCustomid:this._param.travelerCustomid,
+                            travelerTime:this._param.travelerTime,                           
+                        }
+                    }
+                    this.showVisible = true
+                    console.log(param)
+                    myAjax(param).then(res=>{
+                        console.log(res)
+                        if(res.code == '0000'){
+                            this.showVisible = false                                                        
+                            window.location.href = res.data.payRequest                                                                                                          
+                        }
+                        
+                    }).catch(err=>{
+                        console.log(err)
+                    })
+
+                },
+                
+            }
+        })
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>成为向导</title>
+    <link rel="stylesheet" type="text/css" href="css/reset.css">
+    <link rel="stylesheet" type="text/css" href="css/common.css">
+    <link rel="stylesheet" type="text/css" href="css/resetIndex.css">
+    <!-- vant ui -->
+    <link rel="stylesheet" type="text/css" href="css/vant.css">
+    <!-- 高德js -->
+    <!-- <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=5bae0a819ff3c0032540c9297f4a0e83">
+    </script> -->
+    <style>
+        .van-icon-warning-o:after{
+            content:'范亚楠';
+            font-size: 14px;
+        }
+        .van-icon, .van-icon::after{
+            display: inline-block;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="toBeGuider" class="pad_15">
+        <p class="tg_label zhushi pad_10">
+            成为向导有丰厚的奖励，
+            并且能让你获得更好的个人发展
+        </p>
+        <van-notice-bar left-icon="https://img.yzcdn.cn/1.png公告" text="足协杯战线连续第2年上演广州德比战，上赛季半决赛上恒大以两回合5-3的总比分淘汰富力。" >
+        </van-notice-bar>
+        <!--1 基本信息 -->
+        <div class="box_shadow_toGuider min_h100 pad_10 mar_b24">
+            <!-- 标题 -->
+            <h1 class="tg_caption">基本信息</h1>
+            <!-- 表单 -->
+            <div class="guider_form">
+                <van-cell-group>
+                    <!-- 角落ID -->
+                    <van-field v-model="up_customid" clearable label="推荐人ID：" :disabled="isUpdate"
+                        placeholder="如果没有推荐人ID可不填">
+                    </van-field>
+                    <!-- 姓名 -->
+                    <van-field v-model="name" clearable label="姓名：" placeholder="请输入您的姓名">
+                    </van-field>
+                    <!-- 性别 -->
+                    <div class="van-cell  van-field">
+                        <div class="van-cell__title van-field__label">
+                            <span>性别：</span>
+                        </div>
+                        <div class="van-cell__value">
+                            <div class="van-field__body">
+                                <van-radio-group v-model="sex" class="JL_sex">
+                                    <van-radio name="01">男</van-radio>
+                                    <van-radio name="02" class="jls_girl">女</van-radio>
+                                </van-radio-group>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 身高 -->
+                    <van-field v-model="tall" type="number" clearable label="身高：" placeholder="请输入您的身高"
+                        class="tall_unit">
+
+                    </van-field>
+                    <!-- 体重 -->
+                    <van-field v-model="weight" type="number" clearable label="体重：" placeholder="请输入您的体重"
+                        class="weight_unit">
+
+                    </van-field>
+                    <!-- 出生日期 -->
+                    <van-field v-model="birthday" clearable label="出生日期：" placeholder="请选择您的出生日期"
+                        right-icon="arrow-down" readonly="readonly" @click="showDatetimepicker">
+
+                    </van-field>
+
+                    <!-- 详细地址 -->
+                    <van-field v-model="address" clearable label="现居住地址：" placeholder="请输入您的现居住地址">
+                    </van-field>
+                    <!-- 身份证号 -->
+                    <van-field v-model="identity_no" clearable label="身份证号：" placeholder="请输入您的二代身份证号">
+                    </van-field>
+                    <!-- 民族 -->
+                    <van-field v-model="traveler_native" clearable label="民族：" placeholder="请选择民族" readonly="readonly"
+                        @click="showNative = true" right-icon="arrow-down">
+
+
+                    </van-field>
+                    <!-- 职业 -->
+                    <van-field v-model="profession_name" clearable label="职业：" placeholder="请选择职业" readonly="readonly"
+                        @click="showProfession = true" right-icon="arrow-down">
+                    </van-field>
+                    <!-- 学校 -->
+                    <van-field v-model="school_name" v-show="showSchool_name" clearable label="学校："
+                        placeholder="请输入您的学校">
+                    </van-field>
+                </van-cell-group>
+
+            </div>
+        </div>
+        <!--1 居住地-->
+        <div class="box_shadow_toGuider min_h100 pad_10 mar_b24">
+            <h1 class="tg_caption">请选择您可以提供向导服务的城市</h1>
+            <!-- 常居住地 -->
+            <van-field v-model="area_names" clearable label="地址" placeholder="请选择省市区" right-icon="arrow-down"
+                readonly="readonly" @click="showAdress = true">
+            </van-field>
+        </div>
+        <!--2 联系方式 -->
+        <div class="box_shadow_toGuider min_h100 pad_10 mar_b24">
+            <!-- 标题 -->
+            <h1 class="tg_caption">联系方式</h1>
+            <!-- 表单 -->
+            <div class="guider_form">
+                <van-cell-group>
+                    <!-- 电话 -->
+                    <van-field v-model="phone" clearable label="电话：" placeholder="请输入您的手机号" type="number">
+                    </van-field>
+                    <!-- 微信 -->
+                    <van-field v-model="wechat" clearable label="微信：" placeholder="请输入您的微信号">
+                    </van-field>
+                    <!-- 陌陌 -->
+                    <van-field v-model="momo" clearable label="陌陌：" placeholder="请输入您的陌陌号">
+                    </van-field>
+                </van-cell-group>
+            </div>
+        </div>
+        <!--3 实名信息 -->
+        <div class="box_shadow_toGuider min_h100 pad_10 mar_b24">
+            <!-- 标题 -->
+            <h1 class="tg_caption">实名信息</h1>
+            <!-- 每一块证件信息====身份证明 -->
+            <div class="manCard_item">
+                <h2 class="tg_label mar_tb10">身份证明 ：</h2>
+                <van-row>
+                    <van-col span="12" class="">
+                        <!-- 正面 -->
+                        <div class="center_middle pad_tb15">
+                            <div class="posi_rela upload_wrapper ">
+                                <input class="selImg uploadInpu idcard_front" type="file" data_type="card_1" id=""
+                                    num="0" onchange="handleFiles(this.files,this)">
+                                <img id="IDcard_01" class="showImg" :src="IDcard_imgURL_front" alt="">
+                            </div>
+                            <span class="tg_label mar_tb15">身份证正面</span>
+                        </div>
+
+                    </van-col>
+                    <van-col span="12">
+                        <!-- 反面 -->
+                        <div class="center_middle pad_tb15">
+                            <div class="posi_rela upload_wrapper ">
+                                <input class="selImg uploadInpu idcard_front" type="file" data_type="card_1" id=""
+                                    num="1" onchange="handleFiles(this.files,this)">
+                                <img id="IDcard_02" class="showImg" :src="IDcard_imgURL_back" alt="">
+                            </div>
+                            <span class="tg_label mar_tb15">身份证背面</span>
+                        </div>
+                    </van-col>
+                </van-row>
+            </div>
+        </div>
+        <!-- 4实名信息 学生证 -->
+        <div v-show="showStudentCard" class="box_shadow_toGuider min_h100 pad_10 mar_b24">
+            <!-- 标题 -->
+            <h1 class="tg_caption">实名信息</h1>
+            <!-- 每一块证件信息====学生证 -->
+            <div class="manCard_item">
+                <h2 class="tg_label mar_tb10">学生证明 ：</h2>
+                <van-row>
+                    <van-col span="12" class="">
+                        <!-- 正面 -->
+                        <div class="center_middle pad_tb15">
+                            <div class="posi_rela upload_wrapper ">
+                                <input class="selImg uploadInpu idcard_front" type="file" data_type="card_3" id=""
+                                    num="0" onchange="handleFiles(this.files,this)">
+                                <img id="student_01" class="showImg" :src="studentCard_imgURL" alt="">
+                            </div>
+                            <span class="tg_label mar_tb15">学生证</span>
+                        </div>
+
+                    </van-col>
+
+                </van-row>
+            </div>
+        </div>
+        <!-- 5实名信息 导游证 -->
+        <div v-show="showGuiderCard" class="box_shadow_toGuider min_h100 pad_10 mar_b24">
+            <!-- 标题 -->
+            <h1 class="tg_caption">实名信息</h1>
+            <!-- 每一块证件信息====导游证 -->
+            <div class="manCard_item">
+                <h2 class="tg_label mar_tb10">导游证明 ：</h2>
+                <van-row>
+                    <van-col span="12" class="">
+                        <!-- 正面 -->
+                        <div class="center_middle pad_tb15">
+                            <div class="posi_rela upload_wrapper ">
+                                <input class="selImg uploadInpu idcard_front" type="file" data_type="card_2" id=""
+                                    num="0" onchange="handleFiles(this.files,this)">
+                                <img id="guide_01" class="showImg" :src="guideCard_imgURL" alt="">
+                            </div>
+                            <span class="tg_label mar_tb15">导游证</span>
+                        </div>
+
+                    </van-col>
+
+                </van-row>
+            </div>
+        </div>
+        <!-- 提交信息 -->
+        <div class="toBeGuider_wrap">
+            <van-button round type="default" @click="postTravelerInfo" class="gradient confirm_date">提交信息</van-button>
+        </div>
+
+
+
+        <!-- 弹出 职业列表 -->
+        <van-popup v-model="showProfession" position="bottom">
+            <van-picker show-toolbar title="职业列表" :columns="selectProfessions" @cancel="showProfession = false"
+                @confirm="confirmProfession">
+            </van-picker>
+        </van-popup>
+        <!-- 弹出 民族列表 -->
+        <van-popup v-model="showNative" position="bottom">
+            <van-picker show-toolbar title="民族列表" :columns="selectNatives" @cancel="showNative = false"
+                @confirm="confirmNative">
+            </van-picker>
+        </van-popup>
+        <!-- 弹出 省市区列表 -->
+        <van-popup v-model="showAdress" position="bottom">
+            <van-area :area-list="areaList" :columns-num="3" title="省市区选择" v-model="selectAdress"
+                @cancel="showAdress = false" @confirm="confirmAdress" />
+        </van-popup>
+        <!-- 弹出 日期选择器 -->
+        <van-popup v-model="showDate" position="bottom">
+            <van-datetime-picker v-model="currentDate" type="date" :min-date="minDate" :max-date="maxDate"
+                :formatter="formatter" @cancel="showDate = false" @confirm="confirmDate" title="出生日期" />
+        </van-popup>
+        <!-- 弹出加载中 -->
+        <van-popup v-model="showLoading" get-container="body" style="background-color: transparent;">
+            <van-loading type="spinner" color="#fff">
+            </van-loading>
+        </van-popup>
+        <!--弹出上传中-->
+        <van-popup v-model="showLoading2" get-container="body" style="background-color: transparent;">
+            <van-loading type="spinner" color="#fff">
+                图片上传中...
+            </van-loading>
+        </van-popup>
+    </div>
+    <script src="js/jquery.js"></script>
+    <script src="js/rem.js"></script>
+    <script src="vue-mobile-calendar/vue.js"></script>
+    <!-- 云存储 -->
+    <script src="js/cos-js-sdk-v5.js"></script>
+    <!-- 私有 -->
+    <script src="js/common.js"></script>
+    <script src="js/utils.js"></script>
+    <!-- 城市数据 -->
+    <script src="js/areajson.js"></script>
+    <!-- vant -->
+    <script src="js/vant.js"></script>
+    <script>
+        if (!window.Promise) {
+            document.write(
+                '<script src="//cdn.jsdelivr.net/npm/es6-promise@4.1.1/dist/es6-promise.min.js"><\/script><script>ES6Promise.polyfill()<\/script>'
+            )
+        }
+    </script>
+    <script>
+        let vm = new Vue({
+            el: '#toBeGuider',
+            data: {
+                isUpdate: false,
+                commonURL: '',
+                showLoading: false,
+                showLoading2: false,
+                //cos是否上传成功
+                is_upload_idcard: false,
+                is_upload_student: false,
+                is_upload_guider: false,
+                // 云存储                
+                cos: '',
+                cosParamObj: { //cos云存储 参数 初始化
+                    appId: '',
+                    secretId: '',
+                    secretKey: '',
+                    bucket: '',
+                    region: ''
+                },
+                // 证件图
+                IDcard_imgURL_front: 'img/IDcard_front.png',
+                IDcard_imgURL_back: 'img/IDcard_back.png',
+                studentCard_imgURL: 'img/IDcard_front.png',
+                guideCard_imgURL: 'img/IDcard_front.png',
+
+                idcard_imgArr: [], // 身份证url
+                guidecard_imgArr: [],
+                studentcard_imgArr: [],
+                up_customid: '',
+                name: '',
+                sex: '01',
+                tall: '',
+                weight: '',
+                birthday: '',
+                // 日期选择器 数据列表
+                showDate: false,
+                minDate: new Date(1970, 1, 1),
+                maxDate: new Date(2039, 1, 1),
+                currentDate: new Date(),
+                // 省市区   数据列表
+                areaList: areaList,
+                showAdress: false,
+                selectAdress: '',
+                area_names: '',
+                // 民族  数据列表
+                showNative: false,
+                selectNatives: national,
+                // 职业  数据列表
+                showProfession: false,
+                selectProfessions: professions,
+
+                //  省
+                province: '',
+                province_code: '',
+                //  市
+                city: '',
+                city_code: '',
+                //   区
+                area: '',
+                area_code: '',
+
+                address: '',
+                identity_no: '',
+                identity_type: '', // 证件类别 1 2 3 （身份证：1）
+                traveler_native: '汉族',
+                profession_name: '学生',
+                profession_type: '1', //职业类别 0其他 1学生 2都市白领 3向导 4自由职业
+                guide: '', // 是否有导游证 0  1
+                school_name: '',
+                phone: '',
+                wechat: '',
+                momo: '',
+                // 身份证 正反面;导游证正反面;学生证正反面
+                idcard_back_url: '',
+                idcard_front_url: '',
+                profession_photo_url: '', // 导游证或者学生证
+
+                // 是否显示的数据
+                // 学校
+                showSchool_name: true,
+                // 导游证
+                guide: 0,
+                showGuiderCard: false, // false
+                // 学生证
+                showStudentCard: true // false
+            },
+            created() {
+                this.getCommonURL();
+                getToken();
+                getCustomid();
+                //初始化云存储接口(注意：该方法来源于common.js)
+                this.getDataCOS();
+
+
+            },
+            methods: {
+                //获取 commonURL
+                getCommonURL() {
+                    var url_id = ''
+                    var commonURL1 = window.location.search;
+                    //console.log(header_token);
+                    commonURL1 = commonURL1.slice(1).split('&'); // 285 637需要用到
+                    for (var item of commonURL1) {
+                        if (item.indexOf('commonURL') > -1) {
+                            url_id = item.split('=')[1]
+                        }
+                    }
+                    this.commonURL = 'http://' + url_id;
+                },
+                // 点击 出生日期
+                showDatetimepicker() {
+                    this.showDate = true;
+                },
+                popup: function () {
+                    // 日期选择器
+                    if (!this.showDate) {
+                        this.showDate = true;
+                    } else {
+                        this.showDate = false;
+                    }
+                    // 省市区选择器
+                    if (!this.showAdress) {
+                        this.showAdress = true;
+                    } else {
+                        this.showAdress = false;
+                    }
+                    // 民族数据列表
+                    if (!this.showNative) {
+                        this.showNative = true;
+                    } else {
+                        this.showNative = false;
+                    }
+                    // 职业 数据列表  showProfession
+                    if (!this.showProfession) {
+                        this.showProfession = true;
+                    } else {
+                        this.showProfession = false;
+                    }
+                    // 加载中 gif
+                    if (!this.showLoading) {
+                        this.showLoading = true;
+                    } else {
+                        this.showLoading = false;
+                    }
+                },
+                // 日期 格式化
+                formatter(type, value) {
+                    if (type === 'year') {
+                        return `${value}年`;
+                    } else if (type === 'month') {
+                        return `${value}月`
+                    } else if (type === 'day') {
+                        return `${value}日`
+                    }
+                    return value;
+                },
+                // 日期 确认框
+                confirmDate(value) {
+                    var date = value;
+                    var m = date.getMonth() + 1;
+                    var d = date.getDate();
+                    if (m >= 1 && m <= 9) {
+                        m = "0" + m;
+                    }
+                    if (d >= 0 && d <= 9) {
+                        d = "0" + d;
+                    }
+                    var timer = date.getFullYear() + "-" + m + "-" + d
+                    this.birthday = timer;
+                    this.showDate = false;
+
+                },
+                // 省市区 确认框
+                confirmAdress(pickers) {
+
+                    var _area_name = ''
+                    for (var item of pickers) {
+                        _area_name += item.name
+                    }
+                    this.area_names = _area_name;
+                    // 省市区  
+                    this.province = pickers[0].name;
+                    this.province_code = pickers[0].code;
+                    //  市
+                    this.city = pickers[1].name;
+                    this.city_code = pickers[1].code;
+                    //   区
+                    this.area = pickers[2].name;
+                    this.area_code = pickers[2].code;
+                    // 关闭
+                    this.showAdress = false;
+
+                },
+                // 民族 确认按钮
+                confirmNative(value, index) {
+                    this.traveler_native = value;
+                    this.showNative = false;
+                },
+                // 职业 确认按钮
+                confirmProfession(value, index) {
+                    this.profession_name = value;
+                    this.profession_type = index;
+                    // 判断选的是 学生1 导游3 还是 other
+                    if (index == 1) { // 学生
+                        // 显示学校 ，传学生证
+                        this.showSchool_name = true;
+                        this.showStudentCard = true;
+                        this.showGuiderCard = false;
+                        this.guide = 0;
+                    } else if (index == 3) { // 导游
+                        // 不显示学校，传导游证
+                        this.showSchool_name = false;
+                        this.showStudentCard = false;
+                        this.showGuiderCard = true;
+                        this.guide = 1;
+                    } else {
+                        // 不显示学校，
+                        this.showSchool_name = false;
+                        this.showStudentCard = false;
+                        this.showGuiderCard = false;
+                        this.guide = 0;
+                    }
+                    this.showProfession = false;
+                },
+                // 获取云存储接口
+                getDataCOS() {
+                    // 创建参数对象
+                    let param = {
+                        header_token: header_token,
+                        url: commonURL + '/api/live/getCosKey'
+
+                    }
+                    myAjax(param).then(data => {
+                        if (data.code == '0000') {
+
+                            this.cosParamObj.appId = data.data.liveList.Appid;
+                            this.cosParamObj.secretId = data.data.liveList.SecretId;
+                            this.cosParamObj.secretKey = data.data.liveList.SecretKey;
+                            this.cosParamObj.bucket = data.data.liveList.Bucket;
+                            this.cosParamObj.region = data.data.liveList.Region;
+                            // 创建COS 实例:cos
+                            this.cos = new COS({
+                                AppId: this.cosParamObj.appId,
+                                SecretId: this.cosParamObj.secretId,
+                                SecretKey: this.cosParamObj.secretKey,
+                            });
+
+                            // 获取向导数据
+                            this.getTravelerInfo();
+                        }
+                    })
+                },
+                // 获取向导数据
+                getTravelerInfo() {
+                    // 创建参数对象
+                    let param = {
+                        header_token: header_token,
+                        url: commonURL + '/api/travelerInfo/selectTravelerInfo'
+                    }
+                    // 异步获取后台日期数据  
+                    myAjax(param).then(data => {
+                        //成功
+                        if (data.code == '0000') {
+                            //设置 customid （全局）
+                            custom.customid = data.data.travelerInfo[0].customid;
+                            // 判断是初次进来吗
+                            if (data.data.travelerInfo[0].travelerid == null) { //添加
+                            } else { //赋值  
+                                this.isUpdate = true //禁止修改推荐人ID
+                                this.renderTravelInfo(data.data.travelerInfo[0]);
+                            }
+                        }
+
+                    }).catch(err => {
+
+                    })
+                },
+                // 嵌入后台数据信息
+                renderTravelInfo(data) {
+                    //判断职业
+                    if (data.profession_type == 1) { //学生                        
+                        this.dynamicShowInfo('1');
+                        this.studentCard_imgURL = data.profession_photo_url
+                        //                        console.log(data.profession_photo_url)
+                        var _index13 = data.profession_photo_url.indexOf('/studentCard/');
+                        //                        console.log(_index13)
+                        var _index23 = data.profession_photo_url.indexOf('?')
+                        //                        console.log(_index23)
+                        var modiIdUrl3 = data.profession_photo_url.slice(_index13, _index23);
+                        this.studentcard_imgArr.push(modiIdUrl3)
+                        //                        console.log(modiIdUrl3)
+                    } else if (data.profession_type == 3) { //导游
+                        this.dynamicShowInfo('3');
+                        this.guideCard_imgURL = data.profession_photo_url;
+                        //                        console.log(data.profession_photo_url)
+                        var _index14 = data.profession_photo_url.indexOf('/guideCard');
+                        var _index24 = data.profession_photo_url.indexOf('?');
+                        var modiIdUrl4 = data.profession_photo_url.slice(_index14, _index24);
+                        this.guidecard_imgArr.push(modiIdUrl4)
+                        console.log(modiIdUrl4)
+                    } else {
+                        this.dynamicShowInfo('other')
+
+                    }
+                    // 身份证
+                    this.IDcard_imgURL_front = data.idcard_front_url
+                    this.IDcard_imgURL_back = data.idcard_back_url
+
+                    this.idcard_imgArr.push()
+                    // 存储固定的身份证格式
+                    var _index1 = data.idcard_front_url.indexOf('IDcard')
+                    var _index2 = data.idcard_front_url.indexOf('?')
+                    var modiIdUrl = data.idcard_front_url.slice(_index1, _index2)
+
+                    var _index12 = data.idcard_back_url.indexOf('IDcard')
+                    var _index22 = data.idcard_back_url.indexOf('?')
+                    var modiIdUrl2 = data.idcard_back_url.slice(_index12, _index22)
+
+                    //console.log(data.idcard_front_url)
+                    //                    'IDcard/'+custom.customid+'_01.'+
+                    //                    /guideCard/
+                    //                    /studentCard/
+                    ID_imgUrlArr.push(modiIdUrl)
+                    ID_imgUrlArr.push(modiIdUrl2)
+                    //角落id  姓名  性别  身高  体重  出生日期  常居住地 详细地址  身份证号  民族
+                    this.up_customid = data.up_customid
+
+                    this.name = data.name
+                    this.sex = data.sex
+                    this.tall = data.tall
+                    this.weight = data.weight
+                    this.birthday = data.birthday
+
+                    this.area_names = data.province + data.city + data.area;
+                    //  省
+                    this.province = data.province
+                    this.province_code = data.province_code;
+                    //  市
+                    this.city = data.city;
+                    this.city_code = data.city_code;
+                    //   区
+                    this.area = data.area;
+                    this.area_code = data.area_code;
+
+                    this.address = data.address;
+                    // 身份证
+                    this.identity_no = data.identity_no;
+                    this.identity_type = data.identity_type;
+
+                    // 民族
+                    this.traveler_native = data.traveler_native;
+                    // 职业
+                    this.profession_name = professions[data.profession_type];
+                    this.profession_type = data.profession_type;
+                    // 学校
+                    this.school_name = data.workplace;
+
+                    // 电话 微信 陌陌
+                    this.phone = data.phone;
+                    this.wechat = data.webchat;
+                    this.momo = data.momo;
+                },
+                // 展示图片
+                showImg(obj, key, targetImg) {
+
+                    //获取cos 图片               
+                    this.cos.getObjectUrl({
+                        Bucket: obj.bucket,
+                        Region: obj.region,
+                        Key: key,
+                        Sign: true
+                    }, function (err, data) {
+                        console.log(data.Url);
+                        $(targetImg).attr('src', data.Url);
+                    });
+                },
+                //动态显示 证件，学校显示
+                dynamicShowInfo(type) {
+                    if (type == '1') {
+
+                        //显示学校
+                        this.showSchool_name = true;
+                        //证件 并显示 图
+                        this.showStudentCard = true;
+                        this.showGuiderCard = false;
+                    } else if (type == '3') {
+                        //隐藏学校
+                        this.showSchool_name = false;
+                        //证件
+                        this.showStudentCard = false;
+                        this.showGuiderCard = true;
+                    } else {
+                        //隐藏学校
+                        this.showSchool_name = false;
+                        //证件
+                        this.showStudentCard = false;
+                        this.showGuiderCard = false;
+                    }
+                },
+                // 提交 数据
+                postTravelerInfo() {
+                    // 校验
+                    if (this.validTravelerInfo()) {
+                        // 加载中
+                        this.showLoading = true;
+
+                        let profession_photo_url = '';
+                        if (this.profession_type == 1) { // 学生
+                            profession_photo_url = this.studentcard_imgArr[0]
+
+                        } else if (this.profession_type == 3) { //向导
+                            profession_photo_url = this.guidecard_imgArr[0]
+
+                        } else {
+                            profession_photo_url = ''
+                        }
+                        // 创建参数对象
+                        let param = {
+                            header_token: header_token,
+                            url: commonURL + '/api/travelerInfo/addTravelerInfo',
+                            data: {
+                                up_customid: this.up_customid,
+                                name: this.name,
+                                sex: this.sex,
+                                tall: this.tall,
+                                weight: this.weight,
+                                birthday: this.birthday,
+                                province: this.province,
+                                province_code: this.province_code,
+                                city: this.city,
+                                city_code: this.city_code,
+                                area: this.area,
+                                area_code: this.area_code,
+                                address: this.address,
+                                identity_no: this.identity_no,
+                                traveler_native: this.traveler_native,
+                                profession_type: this.profession_type,
+                                profession_name: this.profession_name,
+                                workplace: this.school_name,
+                                phone: this.phone,
+                                webchat: this.wechat,
+                                momo: this.momo,
+                                guide: this.guide,
+                                // 身份证 url
+                                identity_type: 1,
+                                idcard_back_url: this.idcard_imgArr[1],
+                                idcard_front_url: this.idcard_imgArr[0],
+                                profession_photo_url: profession_photo_url
+                            }
+                        }
+                        // 异步获取后台日期数据  
+                        myAjax(param).then(data => {
+                            //成功
+                            if (data.code == '0000') {
+                                this.showLoading = false;
+                                this.$toast('提交成功')
+                                // 请求 最新数据
+                                //this.getTravelerInfo();
+                            } else {
+                                this.$toast(data.msg);
+                            }
+
+                        }).catch(err => {
+
+                        })
+                    }
+
+                },
+                // 去除空字符串
+                trim(str) { //删除左右两端的空格
+                    return str.replace(/(^\s*)|(\s*$)/g, "");
+                },
+                // 数据校验
+                validTravelerInfo() {
+                    this.idcard_imgArr = ID_imgUrlArr;
+                    // 姓名 性别 身高 体重 出生日期 居住地 详细地址 身份证号 民族 职业 电话 微信 身份证图 
+                    if (!this.name) {
+                        this.$toast('请输入姓名');
+                        return false
+                    }
+                    if (!this.sex) {
+                        this.$toast('请选择性别');
+                        return false
+                    }
+                    if (!this.tall) {
+                        this.$toast('请输入身高');
+                        return false
+                    }
+                    if (!this.weight) {
+                        this.$toast('请输入体重');
+                        return false
+                    }
+                    if (!this.birthday) {
+                        this.$toast('请选择出生日期');
+                        return false
+                    }
+                    if (!this.area_names) {
+                        this.$toast('请选择常居住地');
+                        return false
+                    }
+                    if (!this.address) {
+                        this.$toast('请输入详细地址');
+                        return false
+                    }
+                    if (!this.identity_no) {
+                        this.$toast('请输入身份证号');
+                        return false
+                    } else {
+                        //                        let regIdNo = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
+                        //                        if(!regIdNo.test(this.trim(this.identity_no))){
+                        //                            this.$toast('请输入正确的身份证号');
+                        //                            return false;
+                        //                        }
+                        if (!valid_IDcard(this.trim(this.identity_no))) {
+                            this.$toast('请输入正确的身份证号')
+                            return false
+                        };
+                    }
+                    if (!this.traveler_native) {
+                        this.$toast('请选择民族');
+                        return false
+                    }
+                    if (!this.profession_name) {
+                        this.$toast('请选择职业');
+                        return false
+                    } else if (this.profession_type == 1) { // 学生
+                        //判断 学校
+                        if (!this.school_name) {
+                            this.$toast('请输入学校');
+                            return false
+                        }
+                        // 判断 学生证
+                        if (this.studentcard_imgArr.length == 0 || this.studentcard_imgArr[0] == "") {
+                            this.$toast('请上传学生证图片');
+                            return false
+
+                        }
+                        //判断 学生证是否上传成功
+                        if (!this.is_upload_student) {
+                            this.$toast('请重新上传学生证图片')
+                            return false
+                        }
+                    } else if (this.profession_type == 3) { // 导游
+                        // 判断 导游证
+                        if (this.guidecard_imgArr.length == 0 || this.guidecard_imgArr[0] == "") {
+                            this.$toast('请上传导游证图片');
+                            return false
+                        }
+                        //判断 导游证是否上传成功
+                        if (!this.is_upload_guider) {
+                            this.$toast('请重新上传导游证图片')
+                            return false
+                        }
+                    }
+                    if (!this.phone) {
+                        this.$toast('请输入手机号');
+                        return false
+                    } else {
+                        if (!
+                            /^1[3456789]\d{9}$/
+                                .test(this.phone)) {
+                            this.$toast('请输入正确的手机号');
+                            return false
+                        }
+                    }
+                    if (!this.wechat) {
+                        this.$toast('请输入微信号');
+                        return false
+                    }
+                    // 身份证
+                    if (this.idcard_imgArr.length < 2) {
+                        /*  if (this.IDcard_imgURL_front.length < 21) {
+                              this.$toast('请上传身份证图片');
+                              return false
+                          }
+                          if (this.IDcard_imgURL_back.length < 21) {
+                              this.$toast('请上传身份证图片');
+                              return false
+                          }*/
+                        this.$toast('请上传身份证图片');
+                        return false
+
+                    }
+                    //判断 导游证是否上传成功
+                    if (!this.is_upload_idcard) {
+                        this.$toast('请重新上传身份证图片')
+                        return false
+                    }
+                    return true
+                }
+
+            }
+        })
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title class="page_title">角落向导红包天天领，欢迎加入角落里</title>
+    <link rel="stylesheet" href="css/DPlayer.min.css">
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/vant.css">
+    <style>
+        [v-cloak] {
+            display: none !important;
+        }
+        .page_title{
+            text-align: center;
+        }
+        a:active { text-decoration:blink} 
+        a:active{
+            text-decoration: none;
+        }
+        a:visited { text-decoration: none;} 
+        .van-loading {
+            position: fixed;
+            top: 50%;
+            margin-top: -38px;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .van-loading__text {
+            color: #1989fa;
+        }
+
+        .van-overlay {
+            background-color: rgba(255, 255, 255, 1);
+        }
+
+        .btn_gray {
+            background-color: #DADADA;
+            border: 1px solid #DADADA;
+        }
+
+        .btn_color {
+            background-color: rgba(25, 137, 250, 0.9);
+            border-color: rgba(25, 137, 250, 0.9)
+        }
+
+        .btn_color:active {
+            background-color: rgba(25, 137, 250, 1);
+            border-color: rgba(25, 137, 250, 1)
+        }
+
+        /* 助力 */
+        .main_content .m_wrap {
+            max-height: 2.387rem;
+            overflow: hidden;
+            position: relative;
+        }
+        .main_content .m_wrap .left_logo{
+            position: absolute;
+            top:0.1rem;
+            left:0.1rem;
+            width:0.835rem;
+        }
+        .main_content .m_wrap .img_bg {
+            width: 100%;
+            max-height: 100%;
+        }
+
+        .bg_fff {
+            background-color: #fff;
+        }
+
+        .top_wrap {
+            width: 3.325rem;
+            height: 4.51rem;
+            margin: auto;
+            margin-top: -0.432rem;
+            z-index: 1;
+            position: relative;
+            background: url('imgs/bg_up.png') no-repeat center center;
+            background-size: 100% 100%;
+        }
+
+        .bottom_wrap {
+            width: 3.325rem;
+            height: 2.4595rem;
+            margin: auto;
+            position: relative;
+            z-index: 1;
+            background: url('imgs/bg_down.png') no-repeat center center;
+            background-size: 100% 100%;
+        }
+
+        .avatar {
+            width: 0.983rem;
+            height: 0.983rem;
+            border-radius: 50%;
+            border: 4px solid #fff;
+            background-size: 100% 100% !important;
+            margin: auto;
+            box-sizing: border-box;
+            position: absolute;
+            left: 0;
+            right: 0;
+            margin: auto;
+            top: -0.49rem;
+        }
+
+        .main_info {
+            padding-top: 0.49rem;
+            /* width: 2.2rem; */
+            width: 79.5%;
+            margin: auto;
+        }
+
+        /* 字体 */
+        .profession_icon {
+            padding: 0.02rem 0.06rem;
+            background-color: #9E9E9E;
+            border-radius: 0.1rem;
+        }
+
+        .profession_icon img {
+            width: 0.1rem;
+        }
+
+        .font_16 {
+            font-size: 0.16rem;
+        }
+
+        .font_12 {
+            font-size: 0.12rem;
+        }
+
+        .nik_color {
+            color: #090909;
+        }
+
+        .tip_color {
+            color: #7E7E7E;
+        }
+
+        .inl_b {
+            display: inline-block;
+            vertical-align: middle;
+
+        }
+
+        .txt_center {
+            text-align: center;
+        }
+
+        .zhuli {
+            width: 0.81rem;
+            height: 0.81rem;
+            /* background: url('imgs/btn_submit.png') no-repeat center center; */
+            background-size: 100% 100% !important;
+        }
+
+        .zhuli_wrap {
+            margin-top: 0.1rem;
+        }
+
+        .zhuli_wrap img {
+            width: 0.22rem;
+            vertical-align: middle;
+        }
+
+        .color_fff {
+            color: #fff;
+        }
+
+        .cus_video {
+            /* width: 1.755rem; */
+            width: 100%;
+            height: 1.7rem;
+            margin: 0.1rem auto;
+            border-radius: 0.1rem;
+        }
+
+        .dplayer-controller {}
+
+        .dplayer-setting,
+        .dplayer-icon.dplayer-full-in-icon {
+            display: none !important;
+        }
+
+        /* 下部下 */
+        .dsd {
+            position: relative;
+        }
+
+        .dsd img {
+            position: absolute;
+            width: 0.095rem;
+            top: -0.45rem;
+        }
+
+        .dsd .ds_l {
+            left: 0.3rem;
+        }
+
+        .dsd .ds_r {
+            right: 0.3rem;
+        }
+
+        .small_tip {
+            
+            padding-top: 0.05rem;
+        }
+
+        .small_tip img {
+            width: 0.245rem;
+        }
+
+        .download_gradient {
+            background: -moz-linear-gradient(left, #FF4853 0%, #EF772E 100%);
+            background: -webkit-gradient(linear, left, right, color-stop(0%, #FF4853), color-stop(100%, #EF772E));
+            background: -webkit-linear-gradient(left, #FF4853 0%, #EF772E 100%);
+            background: -o-linear-gradient(left, #FF4853 0%, #EF772E 100%);
+            background: -ms-linear-gradient(left, #FF4853 0%, #EF772E 100%);
+            background: linear-gradient(to right, #FF4853 0%, #EF772E 100%);
+        }
+
+        .download_btn {
+            display: block;
+            width: 1.805rem;
+            height: 0.365rem;
+            margin: auto;
+            margin-top: 0.15rem;
+            line-height: 0.365rem;
+            border-radius: 0.1825rem;
+            letter-spacing: 0.02rem;
+        }
+
+        .tip_item {
+            width: 70%;
+            line-height: 0.2rem;
+            margin: auto;
+        }
+
+        .ni_zhi {
+            font-size: 20px;
+        }
+
+        .mar_5 {
+            margin: 0.05rem 0;
+        }
+
+        /* 去掉后新增样式 */
+        .modi .small_tip{
+            margin-top:0.1rem;
+        }
+        .modi .tip_item{
+            font-size: 0.14rem;
+        }
+    </style>
+</head>
+
+<body style="background-color:#F0F0F0">
+    <div id="share" v-cloak>
+        <div class="main_content">
+            <div class="m_wrap"><img class="img_bg" :src="userInfo.bgurl" alt=""> <img class="left_logo" :src="userInfo.let_logourl" alt=""></div>
+            <!-- 上部上 -->
+            <div class="top_wrap bg_fff">
+                <!-- avatar -->
+                <div class="avatar" :style="{background:'url('+userInfo.headurl+') no-repeat center center'}"></div>
+                <!-- main info -->
+                <div class="main_info">
+                    <!-- 昵称和职业 -->
+                    <div class="txt_center ni_zhi mar_5">
+                        <span class="nik_color font_16 inl_b">{{userInfo.nickname}}</span>
+                        <p class="profession_icon font_12 inl_b"><img src="imgs/icon_student.png" alt="">&nbsp;<span
+                                class="inl_b color_fff">{{ userInfo.profession_name }}</span></p>
+                    </div>
+                    <!-- 工作间ID -->
+                    <div class="tip_color font_12 txt_center mar_5">
+                        <span>工作间ID：</span><span>{{ userInfo.workid }}</span>
+                    </div>
+                    <!-- 个人介绍 -->
+                    <div class="nik_color font_12 mar_5 txt_center">个人介绍：一枚可爱活泼美丽善良的向导</div>
+                    <!-- 录播视频 -->
+                    <div id="dplayer" class="cus_video">
+                    </div>
+                    <!-- 提示 -->
+                    <p class="tip_color font_12 txt_center">点击下方按钮，就能为我助力啦~</p>
+                    <!-- 助力 -->
+                    <div class="zhuli_wrap txt_center">
+                        <img src="imgs/icon_arrowLeft.png" alt="">
+                        <div @click="share" class="inl_b zhuli"
+                            :style="{background:'url('+userInfo.zhuli_bgurl+') no-repeat center center'}"></div>
+                        <img src="imgs/icon_arrowRight.png" alt="">
+                    </div>
+                </div>
+            </div>
+            <!-- 上部下 -->
+            <div class="bottom_wrap bg_fff modi">
+                <!-- 订书钉 -->
+                <div class="dsd">
+                    <img class="ds_l" src="imgs/pic_blackLink.png" alt="">
+                    <img class="ds_r" src="imgs/pic_blackLink.png" alt="">
+                </div>
+                <!-- 小tips -->
+                <div class="small_tip txt_center">
+                    <img class="inl_b " src="imgs/icon_dotLeft.png" alt="">
+                    <span class="inl_b font_16">角落里APP小Tips</span class="inl_b">
+                    <img class="inl_b" src="imgs/icon_dotRight.png" alt="">
+                </div>
+                <!-- 条目 -->
+                <p class="tip_item font_12 nik_color">1. 您可以在工作间向我咨询旅游出行问题</p>
+                <p class="tip_item font_12 nik_color">2. 您也可以预约我上线回答您的旅游疑问</p>
+                <p class="tip_item font_12 nik_color">
+                    3. 如果您有出行需求，可以点击邀约向导，我就可以
+                    带您领略城市的风光、品尝特色的美食啦~
+                </p>
+                <!-- 下载跳转按钮 -->
+                <!-- <a class="download_gradient download_btn color_fff font_16 txt_center"
+                    :href="download_url_android">下载角落里</a> -->
+            </div>
+        </div>
+        <!-- <van-button id="btn" @click="share" :class="{'btn_gray':isGray,'btn_color':isColor}" type="info">助力</van-button> -->
+        <!-- 加载中 -->
+        <van-loading v-show="showVisible" color="#1989fa" type="spinner" size="48px" vertical>加载中...</van-loading>
+        <van-overlay :show="showVisible"></van-overlay>
+    </div>
+    <!-- 微信js-sdk -->
+    <script src="http://res.wx.qq.com/open/js/jweixin-1.4.0.js"></script>
+    <script src="http://res2.wx.qq.com/open/js/jweixin-1.4.0.js"></script>
+    <script src="js/jquery.js"></script>
+    <script src="js/DPlayer.min.js"></script>
+    <script src="js/rem.js"></script>
+    <script src="js/vue.js"></script>
+    <script src="js/vant.js"></script>
+    <script src="js/utils.js"></script>
+    <script>
+        if (!window.Promise) {
+            document.write('<script src="//cdn.jsdelivr.net/npm/es6-promise@4.1.1/dist/es6-promise.min.js"><\/script><script>ES6Promise.polyfill()<\/script>')
+        }
+    </script>
+    <script>
+        let vm = new Vue({
+            el: '#share',
+            data: {
+                tUrl: 'http://58.56.128.226:8088',//http://58.56.128.226:8088
+                isColor: false,
+                isGray: true,
+                showVisible: false,
+                appid: 'wx5ea83ae5a16e68e8',
+                targetCode: '',
+                openId: '',
+                customid: '',
+                shareTaskStatus: '2',
+                timesamp: '',
+                dp: '',//dplayer插件对象
+                unSupport: 'imgs/btn_submit.png',
+                supported: 'imgs/btn_yizhuli.png',
+                download_url:'',
+                download_url_android: 'https://a.app.qq.com/o/simple.jsp?pkgname=video.arkcorner.com',
+                download_url_ios: 'https://apps.apple.com/us/app/%E8%A7%92%E8%90%BD%E9%87%8C/id1472509332?l=zh&ls=1',
+                userInfo: {
+                    bgurl: '',
+                    let_logourl:'imgs/left_logo1.png',
+                    headurl: '',
+                    nickname: '',
+                    workid: '',
+                    profession_type: '',
+                    profession_name: '',
+                    video_url: '',
+                    // 助力的背景色                    
+                    zhuli_bgurl: 'imgs/btn_submit.png' //已助力： 'imgs/btn_yizhuli.png'
+                }
+            },
+            created() {
+                this.initDplayer()
+                // 来自微信官方
+                // https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx5ea83ae5a16e68e8&redirect_uri=https%3A%2F%2Fapp.arkcorner.com%2Fweb%2Fshare.html&response_type=code&scope=snsapi_base&state=123#wechat_redirect                
+                // 判断手机型号,赋值链接地址                
+                // this.isIOS()
+                // 1截取2获取用户信息3验证是否失效                
+                this.getCode()
+                this.getUserInfo()
+
+            },
+            methods: {
+                // 获取用户信息
+                getUserInfo() {
+                    let param = {
+                        url: this.tUrl + '/api/travelerTask/shareInfo',
+                        data: {
+                            customid: this.customid
+                        }
+                    }
+                    this.showVisible = true
+                    myAjax2(param).then(res => {
+                        if (res.code == '0000') {
+                            let result = res.data.shareInfo
+                            //封面 头像 昵称 职业 id 视频录播地址
+                            this.userInfo.bgurl = result.live_photo_url
+                            this.userInfo.headurl = result.headurl
+                            this.userInfo.nickname = result.nickname
+                            this.userInfo.profession_type = result.profession_type
+                            this.switchPrefession(this.userInfo.profession_type)
+                            this.userInfo.workid = result.customid
+                            this.userInfo.video_url = result.live_play_url
+
+                            // 异步初始化dplayer
+                            this.initDplayer()
+
+                            // 判断是否过了有效期
+                            this.validEffective()
+                        } else {
+                            this.showVisible = false
+                            this.$toast('获取向导信息失败')
+                        }
+                    }).catch(err => { })
+                },
+                // 点击助力
+                share() {
+                    let vm = this
+                    //判断当前状态
+                    if (this.shareTaskStatus == '1') {
+                        return
+                    } else {
+                        let param = {
+                            url: this.tUrl + '/api/travelerTask/shareTaskRecord',
+                            data: {
+                                openId: this.openId,
+                                customid: this.customid
+                            }
+                        }
+                        this.showVisible = true
+                        myAjax2(param).then(res => {
+                            if (res.code == '0000') {
+                                // 提示助力成功或者其他
+
+                                this.showVisible = false
+                                this.$toast(res.msg)
+                                this.shareTaskStatus = '1'
+                                // 点击后直接置灰
+                                this.userInfo.zhuli_bgurl = this.supported
+                            } else {
+                                this.showVisible = false
+                                this.$toast(res.msg)
+                            }
+                        }).catch(err => { })
+                    }
+
+                },
+                // 截取code 
+                getCode() {
+
+                    let _str = decodeURIComponent(window.location.search)
+
+                    // 取code
+                    let firstIndex = _str.indexOf('=')
+                    let lastIndex = _str.indexOf('&state')
+                    this.targetCode = _str.slice(firstIndex + 1, lastIndex)
+                    // alert(this.targetCode)
+
+                    // 取customid
+                    let _paramUrl = decodeURIComponent(window.location.search.slice(lastIndex + 7)).split('@')
+
+                    this.customid = _paramUrl[0]
+                    // 取url
+                    this.tUrl = 'http://' + _paramUrl[1]
+                    // 取时间戳
+                    this.timesamp = _paramUrl[2]
+
+                    // alert(this.customid)
+                    // alert(this.tUrl)
+                    // alert(this.timesamp)
+                },
+                // 是否过了有效期
+                validEffective() {
+                    let param = {
+                        url: this.tUrl + '/api/travelerTask/shareTaskOverTime',
+                        data: {
+                            customid: this.customid,
+                            date: this.timesamp
+                        }
+                    }
+                    this.showVisible = true
+
+                    myAjax2(param).then(res => {
+                        if (res.code == '0000') {
+                            // shareTaskOverTime   1 已经过期 2 未过期
+                            if (res.data.shareTaskOverTime == '1') {
+                                this.$toast('分享已过期')
+                                // 状态置为1
+                                this.shareTaskStatus = '1'
+                                // 已助力颜色 并 状态为1
+                                this.userInfo.zhuli_bgurl = this.supported
+                                this.showVisible = false
+
+                            } else {
+                                this.postCode()
+                            }
+                        }
+                    }).catch(err => { })
+                },
+                postCode() {
+                    let param = {
+                        url: this.tUrl + '/api/login/webLogin',
+                        data: {
+                            code: this.targetCode
+                        }
+                    }
+
+                    this.showVisible = true
+                    myAjax2(param).then(res => {
+
+                        if (res.code == '0000') {
+
+                            this.openId = res.data.openId
+                            this.showVisible = false
+                            // 查询是否点过
+                            let param = {
+                                url: this.tUrl + '/api/travelerTask/shareTaskStatus',
+                                data: {
+                                    openId: this.openId,
+                                    customid: this.customid
+                                }
+                            }
+
+                            this.showVisible = true
+                            // 查询状态
+                            myAjax2(param).then(res => {
+                                if (res.code == '0000') {
+
+                                    // shareTaskStatus  状态1:已助力 状态2:未助力   
+                                    this.shareTaskStatus = res.data.shareTaskStatus
+
+                                    // 判断状态来更改按钮
+                                    if (this.shareTaskStatus == '1') {
+                                        this.userInfo.zhuli_bgurl = this.supported
+                                    } else {
+                                        this.userInfo.zhuli_bgurl = this.unSupport
+                                    }
+
+
+                                    this.showVisible = false
+
+
+                                } else {
+                                    this.showVisible = false
+                                    this.$toast(res.msg)
+
+                                }
+                            }).catch(err => {
+                                //alert(JSON.stringify(err))
+                            })
+                        } else {
+                            this.showVisible = false
+                            this.$toast(res.msg)
+                        }
+                    }).catch(err => {
+                        alert(JSON.stringify(err))
+
+                    })
+
+                },
+                // 初始化dplayer
+                initDplayer() {
+                    setTimeout(() => {
+                        this.dp = new DPlayer({
+                            container: document.getElementById('dplayer'),
+                            video: {
+                                url: this.userInfo.video_url,
+                                pic: this.userInfo.bgurl
+                            },
+                        });
+                    }, 1)
+                },
+                // 匹配职业类型 0其他 1学生 2都市白领 3导游 4自由职业 
+                switchPrefession(num) {
+                    switch (num) {
+                        case '0':
+                            this.userInfo.profession_name = '其他'
+                            break;
+                        case '1':
+                            this.userInfo.profession_name = '大学生'
+                            break;
+                        case '2':
+                            this.userInfo.profession_name = '都市白领'
+                            break;
+                        case '3':
+                            this.userInfo.profession_name = '导游'
+                            break;
+                        case '4':
+                            this.userInfo.profession_name = '自由职业'
+                            break;
+                        default:
+                            this.userInfo.profession_name = '大学生'
+                    }
+                },
+                // 判断android 还是ios
+                isIOS() {
+                    // 这里根据移动端原生的 userAgent 来判断当前是 Android 还是 ios
+                    var u = navigator.userAgent;
+                    // Android终端
+                    // var isAndroid = u.indexOf('Android') > -1 || u.indexOf('Adr') > -1;
+                    // IOS 终端
+                    var isIOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
+                    if(isIOS){ // ios端
+                        //alert('我是ios')
+                        this.download_url = this.download_url_ios
+                    }else{
+                        //alert('我是安卓')
+                        this.download_url = this.download_url_android
+                    }                 
+                },
+                
+            }
+        })
+    </script>
+</body>
+
+</html>

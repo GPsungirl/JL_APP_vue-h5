@@ -1,0 +1,173 @@
+<!-- 消息详情 -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>消息详情(消息通知 系统通知共用这一个页面)</title>
+    <link rel="stylesheet" type="text/css" href="css/reset.css">
+    <link rel="stylesheet" type="text/css" href="css/common.css">
+    <link rel="stylesheet" type="text/css" href="css/resetIndex.css">
+    <!-- vant ui -->
+    <link rel="stylesheet" type="text/css" href="css/vant.css">
+    <style>
+        /* 修正一下van-cell 的下划线 100% */
+        .van-cell:not(:last-child)::after {
+            position: absolute;
+            box-sizing: border-box;
+            content: ' ';
+            pointer-events: none;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            border-bottom: 1px solid #ebedf0;
+            -webkit-transform: scaleY(.5);
+            transform: scaleY(.5);
+        }
+
+        [v-cloak] {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="bussinessDeal_detail" class="pad_15" v-cloak>
+        <div class="content_detail">
+            {{ notice_content }}
+        </div>
+        <!--弹出-->
+        <van-popup v-model="showLoading3" get-container="body" style="background-color: transparent;">
+            <van-loading type="spinner" color="#fff">
+                加载详情...
+            </van-loading>
+        </van-popup>
+    </div>
+    <script src="js/jquery.js"></script>
+    <script src="js/rem.js"></script>
+    <script src="vue-mobile-calendar/vue.js"></script>
+    <!-- 私有 -->
+    <script src="js/common.js"></script>
+    <script src="js/utils.js"></script>
+    <!-- vant -->
+    <script src="js/vant.js"></script>
+    <script>
+        if (!window.Promise) {
+            document.write(
+                '<script src="//cdn.jsdelivr.net/npm/es6-promise@4.1.1/dist/es6-promise.min.js"><\/script><script>ES6Promise.polyfill()<\/script>'
+            )
+        }
+    </script>
+    <script>
+        let vm = new Vue({
+            el: '#bussinessDeal_detail',
+            data: {
+                showLoading3: false,
+                noticeid:'',
+                type:'',
+                notice_content:'',
+            },
+            created() {
+                
+                // 获取commonURL
+                this.getCommonURL();
+                // 获取noticeid
+                this.getNoticeid();
+                getToken();
+                // 请求详情数据
+                this.getDetailData();
+                // 更新状态
+                this.updateDetailData();
+            },
+            methods: {
+                //获取 commonURL
+                getCommonURL() {
+                    var url_id = ''
+                    var commonURL1 = window.location.search;
+                    //console.log(header_token);
+                    commonURL1 = commonURL1.slice(1).split('&'); // 285 637需要用到
+                    for (var item of commonURL1) {
+                        if (item.indexOf('commonURL') > -1) {
+                            url_id = item.split('=')[1]
+                        }
+                    }
+                    this.commonURL = 'http://' + url_id;
+                },
+                // 获取noticeid
+                getNoticeid() {
+                    // 获取noticeid  和 type
+                    var notice_id = '' ;
+                    let type = '';                   
+                    customid = window.location.search.slice(1).split('&'); 
+                    for (var item of customid) {
+                        if (item.indexOf('noticeid') > -1) {
+                            notice_id = item.split('=')[1]
+                        }
+                        if(item.indexOf('type')> -1) {
+                            type = item.split('=')[1]
+                        }
+                    }
+                    this.noticeid = notice_id;
+                    this.type = type;
+                    
+                },
+                // 加载数据
+                getDetailData(url) {
+                    this.showLoading3 = true
+                    // 异步更新数据
+                    let param = {
+                        header_token: header_token,
+                        url: this.commonURL+'/api/notice/selectSysPushMsg', //this.commonURL
+                        data: {
+                            noticeid:this.noticeid,
+                            // 交易类型 1交易通知 2行程通知 3系统通知
+                            notice_type: this.type,
+                            notice_status:2,
+                        }
+                    }
+                    myAjax(param).then(res => {
+
+                        if (res.code === '0000') {
+                            this.notice_content = res.data.noticeInfo.notice_content
+                            this.showLoading3 = false
+                            
+                        } else {
+
+                        }
+                    }).catch(err => console.log(err))
+
+                },
+                // 更新数据
+                updateDetailData(){
+                    this.showLoading3 = true
+                    // 异步更新数据
+                    let param = {
+                        header_token:header_token, //header_token
+                        url: this.commonURL+'/api/notice/updateSysPushMsg', //this.commonURL
+                        data: {
+                            noticeid:this.noticeid,
+                            // 交易类型 1交易通知 2行程通知 3系统通知
+                            notice_type: this.type,
+                            notice_status:2,
+                        }
+                    }
+                    myAjax(param).then(res => {
+
+                        if (res.code === '0000') {
+                                                       
+                        } else {
+
+                        }
+                    }).catch(err => console.log(err))
+                }
+               
+            }
+        })
+    </script>
+</body>
+
+</html>

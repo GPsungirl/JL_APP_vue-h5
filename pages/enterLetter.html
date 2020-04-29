@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>致入驻商一封信</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/common.css">
+</head>
+
+<body>
+    <div class="main_content">
+        <!-- 顶部banner -->
+        <div class="letter_img"><img src="img/letterbanner.png" alt=""></div>
+        <!-- 主体内容 -->
+        <div class="letter_content">
+            <h5 class="l_title2 title1">
+                Hi，各位：
+            </h5>
+
+            <p class="l_title3 title3">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;在我们的运营过程中，有部分用户咨询我们的向导去哪个酒店住宿更舒适、去哪个咖啡厅环境更优雅、去哪个饭店吃饭更有特色。所以我们诚挚地邀请优质的商家入驻我们平台，入驻和被我们向导推荐都是免费的，我们只希望您能为角落里用户提供更优质的服务。
+                
+            </p>
+            <p class="l_title3 title3">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;第一期入驻商家都由我们的向导进行推荐以及引领前往，第二期将为商家提供展示平台。
+            </p>
+            <h5 class="l_title2 title1">
+                招募商家范围：
+            </h5>
+            <div class="red_con">
+                <p class="letter_list l_title2 color_red">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;·酒店</p>
+                <p class="letter_list l_title2 color_red">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;·饭店</p>
+                <p class="letter_list l_title2 color_red">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;·咖啡厅</p>
+            </div>
+            <h5 class="l_title2 title1">
+                招募商家要求：
+            </h5>
+            <div class="red_con">
+                <p class="letter_list l_title2 color_lan">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;·未发生过欺诈消费者行为</p>
+                <p class="letter_list l_title2 color_lan">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;·未发生过食品安全类纠纷</p>
+                <p class="letter_list l_title2 color_lan">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;·未发生过服务质量纠纷</p>
+                <p class="letter_list l_title2 color_lan">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;·未发生过消协投诉</p>
+                <p class="letter_list l_title2 color_lan">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;·可以为角落里用户优先安排服务并享受本店会员同等待遇</p>
+            </div>
+            <p class="l_title3 title3">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;我们诚邀与您一
+                起把这座城市的文明与优质服务展现给我们的角落里用户！
+            </p>
+            <div class="red_con">
+                <p class="l_title3 title3 lineh_h">入驻咨询：0532-88903698</p>
+                <p class="l_title3 title3 lineh_h">微信：17561681218</p>
+                <p class="l_title3 title3 lineh_h txt_r">角落里</p>
+            </div>
+            <!-- <div id="confirm_btn"   class="confirm_btn join_gradient l_title2">
+                立即加入
+            </div> -->
+        </div>
+    </div>
+    <script src="js/rem.js"></script>
+    <script>
+        // 立即加入 跳往电话
+        window.onload = function () {
+            // 这里根据移动端原生的 userAgent 来判断当前是 Android 还是 ios
+            var u = navigator.userAgent;
+            // Android终端
+            var isAndroid = u.indexOf('Android') > -1 || u.indexOf('Adr') > -1;
+            // IOS 终端
+            var isIOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
+
+
+            // var confirm_btn = document.getElementById('confirm_btn');
+            // confirm_btn.addEventListener('click', function () {
+            //     if (isAndroid) {
+            //         App.chooseDate('dialnumber');
+            //     } else if (isIOS) {
+            //         appJs.clickDetermine('dialnumber');
+            //     }
+
+            // })
+        }
+    </script>
+</body>
+
+</html>

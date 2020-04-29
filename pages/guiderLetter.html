@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>致加盟商一封信</title>
+    <link rel="stylesheet" href="css/vant.css">
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/common.css">
+</head>
+
+<body>
+    <div class="main_content">
+        <!-- 顶部banner -->
+        <div class="letter_img"><img src="img/letterbanner.png" alt=""></div>
+        <!-- 主体内容 -->
+        <div class="letter_content">
+            <h5 class="l_title2 title1">
+                致即将成为角落向导的小哥哥小姐姐：
+            </h5>
+            <h4 class="l_title1 title1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hi：</h4>
+            <p class="l_title3 title3">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;小哥哥小姐姐们，我是小角落，非常遗憾的告您,
+                我们家运营官说必须要人工面试，我尝试说服他，
+                结果被打了一顿Ծ‸Ծ…所以我要把他的所有要求偷偷
+                地全部告诉你们。
+            </p>
+            <div class="red_con">
+                <p class="letter_list l_title2 color_red">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;·能够充分掌握自己的时间安排</p>
+                <p class="letter_list l_title2 color_red">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;·愿意做文明的小使者，引领文明出行</p>
+                <p class="letter_list l_title2 color_red">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;·热爱出行，善于沟通</p>
+            </div>
+            <h5 class="l_title2 title1">
+                招募人群：
+            </h5>
+            <div class="red_con">
+                <p class="letter_list l_title2 color_lan">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;·在校大学</p>
+                <p class="letter_list l_title2 color_lan">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;·持证导游</p>
+                <p class="letter_list l_title2 color_lan">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;·自由职业者</p>
+            </div>
+            <p class="l_title3 title3">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;然后填写个人资料一定要真实完整。提交后，
+                我会偷偷地告诉面试官联系你，一定要打扮得美美帅帅的，
+                颜值与智慧并存的你一定要在视频面试中征服面试官。
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;最后偷偷地告诉你一个福利，角落里有专业的美甲师和发型设计师，
+                通过面试后，这些福利都是免费的。
+            </p>
+            <h4 class="l_title1 title1 red_con">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;我在角落等你，一定要来呀！
+            </h4>
+            <div id="confirm_btn" class="confirm_btn join_gradient l_title2">
+                立即加入
+            </div>
+        </div>
+    </div>
+    <script src="js/rem.js"></script>
+    <script src="js/vue.js"></script>
+    <script src="js/vant.js"></script>
+    <script>
+        // 立即加入 跳往电话
+        window.onload = function () {
+            // 尝试提示
+            var Vue = window.Vue;
+            var vant = window.vant;
+            // 注册 Lazyload 组件
+            Vue.use(vant.Lazyload);
+            // 调用函数式组件
+            //vant.Toast('提示');
+            
+            // 这里根据移动端原生的 userAgent 来判断当前是 Android 还是 ios
+            var u = navigator.userAgent;
+            // Android终端
+            var isAndroid = u.indexOf('Android') > -1 || u.indexOf('Adr') > -1;
+            // IOS 终端
+            var isIOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
+
+
+            var confirm_btn = document.getElementById('confirm_btn');
+            confirm_btn.addEventListener('click', function () {
+                // 先判断 是否已经是向导
+                if ('') {
+                    if (isAndroid) {
+                        App.chooseDate('tobeguide');
+                    } else if (isIOS) {
+                        appJs.clickDetermine('tobeguide');
+                    }
+                }else{
+                    vant.Toast('您已经是一名向导');
+                }
+
+
+            })
+        }
+        //
+    </script>
+</body>
+
+</html>

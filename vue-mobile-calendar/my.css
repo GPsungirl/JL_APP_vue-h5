@@ -1,0 +1,59 @@
+.m-day-num{
+    position:relative;
+  }
+  /* 选中时的内层文字效果 */
+  .m-day-num.m-jia:after{
+    position:absolute;
+    top:0px;
+    right:-6px;
+    
+    content:'';    
+    /* border-radius: 100%;
+    font-size: 12px;
+    transform: scale(0.58);
+    color:#F76C6C; */
+    width:12px;
+    height:12px;
+    background:url('../img/date_jia.png');
+    background-size: 100% 100%;
+  }
+  .m-day-num.m-jia.m-select:after{    
+    top:-5px;
+    right:-8px;
+    
+  }
+
+  /*  */
+  .m-calendar .m-months-container .m-months-wrapper .m-months .m-row .m-day .m-select{
+    background: #F76C6C !important;
+  }
+
+  /* 预约 */
+  .time_item.morningIsSchedule,
+  .time_item.afternoonIsSchedule,
+  .time_item.nightIsSchedule{
+    background-color: #ECECEC;
+  }
+
+  /* 请假 */
+  .time_item.morningIsJia,
+  .time_item.afternoonIsJia,
+  .time_item.nightIsJia{
+    background-color: #ECECEC;
+  }
+
+  /* 选中 */
+  .morningIsActive,
+  .afternoonIsActive,
+  .nightIsActive{
+    background-color: #E6F8FF;
+  }
+
+  .nightIsDisbale,
+  .afternoonIsDisbale,
+  .morningIsDisbale{
+    background-color:#e3e3e3;
+  }
+  .confirm_date:active{
+    
+  }

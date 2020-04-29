@@ -1,0 +1,60 @@
+.guider_form .van-hairline--top-bottom::after{
+    border-width:0;
+}
+.box_shadow_toGuider{
+    padding-bottom:0;
+}
+.JL_sex{
+    display: flex;
+}
+.jls_girl{
+    margin-left: 0.4rem;
+}
+
+input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
+
+    color: #ECECEC !important;
+
+}
+
+input:-moz-placeholder, textarea:-moz-placeholder {
+
+     color: #ECECEC !important;
+
+}
+
+input::-moz-placeholder, textarea::-moz-placeholder {
+
+    color: #ECECEC !important;
+
+}
+
+input:-ms-input-placeholder, textarea:-ms-input-placeholder {
+
+    color: #ECECEC !important;
+
+}
+
+/* 身高 体重单位 */
+.tall_unit.van-cell::before{
+    position: absolute;
+    right:0 !important;
+    content:'CM' !important;
+    font-size: 0.13rem;
+    color:#6D7680;
+    bottom:auto !important;
+    border:0 !important;
+    transform: none !important;
+    left:81% !important;
+}
+.weight_unit.van-cell::before{
+    position: absolute;
+    right:0 !important;
+    content:'KG' !important;
+    font-size: 0.13rem;
+    color:#6D7680;
+    bottom:auto !important;
+    border:0 !important;
+    transform: none !important;
+    left:82% !important;
+}

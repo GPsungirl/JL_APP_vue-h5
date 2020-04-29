@@ -1,0 +1,820 @@
+<!-- 请假日历 用户侧-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>向导日历用户侧</title>
+    <!-- less -->
+    <link rel="stylesheet/less" href="vue-mobile-calendar/inlineCalendar.less">
+    <!-- cubeUI -->
+    <link rel="stylesheet" href="vue-mobile-calendar/cube/cube.min.css">
+
+    <link rel="stylesheet" href="vue-mobile-calendar/my.css">
+    <link rel="stylesheet" href="vue-mobile-calendar/mydate.css">
+    <style>
+        [v-cloak] {
+            display: none !important;
+        }
+
+        .van-loading {
+            position: fixed;
+            top: 50%;
+            margin-top: -38px;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .van-loading__text {
+            color: #1989fa;
+        }
+
+        .van-overlay {
+            background-color: rgba(255, 255, 255, .7);
+        }
+    </style>
+</head>
+
+<body style="padding:0.15rem;">
+    <div id="app" v-cloak>
+        <!-- 日历部分 -->
+        <div class="m-calendar" ref="calendar">
+            <!-- 年份月份 导航 -->
+            <div class="m-toolbar">
+                <div class="m-year-selector PFSC_Regular title_year_month" style="justify-content:start;padding:0">
+                    <!-- <a class="m-prev-btn" @click="changeYear('prev')"></a> -->
+                    <span>{{showDate.year}}{{yearName}}</span>
+                    <span>{{monthNames[showDate.month-1]}}</span>
+                    <!-- <a class="m-next-btn" @click="changeYear('next')"></a> -->
+                </div>
+                <!-- <div class="m-month-selector">
+                    <a class="m-prev-btn" @click="changeMonth('prev')"></a>
+                    
+                    <a class="m-next-btn" @click="changeMonth('next')"></a>
+                    </div> -->
+            </div>
+            <!-- 星期 的导航 -->
+            <div class="m-week-header PFSC_Regular week_nav">
+                <div class="m-week-day" v-for="item in weekNames" :key="item">
+                    {{item}}
+                </div>
+            </div>
+            <!-- 具体的日期 -->
+            <div class="m-months-container" @touchstart="touchstart" @touchmove="touchmove" @touchend="touchend">
+                <div class="m-months-wrapper" :style="{'transform': `translate3d(${-translateX*100}%, 0, 0)`}">
+                    <div class="m-months" v-for="(month,monthIndex) in fullDate" :myData="monthIndex" :key="monthIndex"
+                        :style="{
+                        transform: `translate3d(${(monthIndex-1+translateX + (isTouching ? touch.x : 0))*100}%, 0, 0)`,
+                        transitionDuration: isTouching ? '0s' : '.3s',
+                        }">
+                        <div class="m-row" v-for="(week,weekIndex) in month" :key="weekIndex">
+                            <div class="m-day " v-for="(day,dayIndex) in week" :key="dayIndex" @click="onDayClick(day)">
+                                <span :class="{
+                                'm-day-num':true,
+                                'm-grey': day.isGrey,
+                                'm-today': day.isToday,
+                                'm-disable': day.isDisable,
+                                'm-select': day.isSelect,
+                                'm-during': day.isDuring,
+                                
+                                'm-hidden':day.isHidden,
+                                
+                            }">
+                                    {{day.value}}
+
+                                </span>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 展示早中晚 -->
+        <div class="show_time">
+            <p class="st_title">项目选择</p>
+            <div class="m_a_n">
+                <div class="morning_wrapper time_item" :class="[{ 
+                            morningIsActive: selectJJ.m  ,
+                            morningIsDisbale:selectJJ.ism                       
+                        }]" @click="onJiaClick('m')">
+                    <div class="ti_img"><img src="img/timg.jpg" alt=""></div>
+                    <p>{{ state_jia.morning.txt }}</p>
+                </div>
+                <div class="afternoon_wrapper time_item" :class="[{ 
+                    afternoonIsActive: selectJJ.a ,
+                    afternoonIsDisbale:selectJJ.isa                            
+                }]" @click="onJiaClick('a')">
+                    <div class="ti_img"><img src="img/timg.jpg" alt=""></div>
+                    <p>{{ state_jia.afternoon.txt }}</p>
+                </div>
+                <div class="night_wrapper time_item" :class="[{ 
+                    nightIsActive: selectJJ.n  ,
+                    nightIsDisbale:selectJJ.isn                               
+                }]" @click="onJiaClick('n')">
+                    <div class="ti_img"><img src="img/timg.jpg" alt=""></div>
+                    <p>{{ state_jia.night.txt }}</p>
+                </div>
+            </div>
+        </div>
+        <!-- 确定 -->
+        <div>
+            <!-- click= -->
+            <div class="gradient confirm_date" @click="confirm_jia">{{ submitBtnTxt }}</div>
+        </div>
+        <!-- 加载中 -->
+        <van-loading v-show="showVisible" color="#1989fa" type="spinner" size="48px" vertical>加载中...</van-loading>
+        <van-overlay :show="showVisible"></van-overlay>
+    </div>
+    <!-- dayjs  calendar_umd.js vue.js -->
+    <script src="js/jquery.js"></script>
+    <script src="js/rem.js"></script>
+    <script src="vue-mobile-calendar/vue.js"></script>
+    <!-- gp公有url -->
+    <script src="js/commonUrl.js"></script>
+    <!-- gp日期模块 -->
+    <script src="js/utils.js"></script>
+    <!-- cubeUI -->
+    <script src="vue-mobile-calendar/cube/cube.min.js"></script>
+
+    <script src="vue-mobile-calendar/Calendar.umd.min.js"></script>
+    <script src="vue-mobile-calendar/dayjs.min.js"></script>
+    <script src="js/native-channel.js"></script>
+    <script>
+        if (!window.Promise) {
+            document.write('<script src="//cdn.jsdelivr.net/npm/es6-promise@4.1.1/dist/es6-promise.min.js"><\/script><script>ES6Promise.polyfill()<\/script>')
+        }
+    </script>
+    <script>
+
+        let touchStartPosition; // 触发起点
+        let touchEndPosition;   // 触发终点
+        let timeStamp;          // 时间戳  
+
+        let vm = new Vue({
+            el: '#app',
+            props: {
+
+                // 单选 或是 多选
+                mode: {
+                    type: String,
+                    default: 'single',
+                },
+
+            },
+            watch: {
+                mode() {
+                    this.init();
+                }
+            },
+            data: {
+                selectJJ: {
+                    m: false,
+                    a: false,
+                    n: false,
+                    //是否有事
+                    ism: false,
+                    isa: false,
+                    isn: false,
+                },
+                // data 
+                fullDate: [[], [], []], // 二维数组
+                translateX: 0,
+                showDate: {
+                    year: undefined,
+                    month: undefined,
+                },
+                dateNow: {  // 当前日期
+                    year: dayjs().year(),
+                    month: dayjs().month() + 1,
+                    date: dayjs().date(),
+                },
+                selectDate: [],
+
+                //保存用户选中的请假的数据
+                clone_selectDate: [],
+                // 当月请假数据:存储当月来自后台的请假数据
+                schedulesArr: [],
+
+                state_jia: {    // 设置请假的状态
+                    //       状态        是否预约         是否请假        是否选中
+                    morning: { state: '0', isSchedule: false, isJia: false, isSelected: false, txt: '晨光出行' },
+                    afternoon: { state: '0', isSchedule: false, isJia: false, isSelected: false, txt: '暖阳午后' },
+                    night: { state: '0', isSchedule: false, isJia: false, isSelected: false, txt: '星空夜景' }
+
+                },
+                submitBtnTxt: '确定',  // 提交按钮的文字
+                touch: {
+                    x: 0,
+                    y: 0,
+                },
+                isTouching: false,
+
+
+
+                // 调用次数测试 
+                countTime: 0,
+                //  来自于 props
+                defaultDate: null,
+
+                disabledDate: [],
+
+                minDate: null,
+                maxDate: null,
+
+                // 单选 或是 多选
+                // mode: 'multiple',
+                // 日期点击 函数
+                dayClick: function () { return true },
+                enableTouch: true,
+
+                // 月数组
+                monthNames: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
+                weekNames: ['一', '二', '三', '四', '五', '六', '日'],
+                yearName: '年',
+
+            },
+
+            created() {
+                this.init(dayjs());
+                // 初始化后台假期数据
+                this.getEventData();
+
+            },
+            mounted() {
+
+            },
+            methods: {
+
+                init(date) {
+
+
+                    this.selectDate = [];
+
+                    let { defaultDate, mode } = this;
+                    if (date) {
+                        defaultDate = date;
+                    }
+                    let dateToShow = dayjs().startOf('month');
+                    if (mode === 'single' && defaultDate) {
+                        this.selectDate = dayjs(defaultDate).startOf('day');
+                        dateToShow = this.selectDate.startOf('month');
+                    }
+                    if (mode === 'multiple' && Array.isArray(defaultDate)) {
+
+                        if (defaultDate.length > 0) {
+                            this.selectDate = defaultDate.map((item) => dayjs(item).startOf('day'));
+                        }
+                    }
+                    if (mode === 'during' && Array.isArray(defaultDate)) {
+                        if (defaultDate.length === 2) {
+                            const startDate = dayjs(defaultDate[0]).startOf('day');
+                            const endDate = dayjs(defaultDate[1]).startOf('day');
+                            if (startDate.isBefore(endDate) || startDate.isSame(endDate)) {
+                                this.selectDate = [startDate, endDate];
+                            }
+                        }
+                    }
+                    this.showDate = {
+                        year: dateToShow.year(),
+                        month: dateToShow.month() + 1,
+                    };
+                    this.getFullDate(this.showDate);
+                },
+                touchstart(event) {
+                    if (this.enableTouch) {
+                        touchStartPosition = event.touches[0].clientX;
+                        touchEndPosition = event.touches[0].clientY;
+                        timeStamp = event.timeStamp;
+                        this.touch = {
+                            x: 0,
+                            y: 0,
+                        };
+                        this.isTouching = true;
+                    }
+                },
+                touchmove(event) {
+                    if (this.enableTouch) {
+                        this.touch = {
+                            x: (event.touches[0].clientX - touchStartPosition) / this.$refs.calendar.offsetWidth,
+                            y: (event.touches[0].clientY - touchEndPosition) / this.$refs.calendar.offsetHeight,
+                        };
+                    }
+                },
+                touchend(event) {
+                    if (this.enableTouch) {
+                        this.isTouching = false;
+                        const during = dayjs(event.timeStamp).diff(timeStamp);
+                        if (Math.abs(this.touch.x) > Math.abs(this.touch.y) && Math.abs(this.touch.x * this.$refs.calendar.offsetWidth) > 20) {
+                            if (this.touch.x > 0) {
+                                this.changeMonth('prev');
+                            } else if (this.touch.x < 0) {
+                                this.changeMonth('next');
+                            }
+                        } else {
+                            this.touch = {
+                                x: 0,
+                                y: 0,
+                            };
+                        }
+                    }
+                },
+                // 触发change事件
+                emitChange() {
+                    this.$emit('change', this.selectDate);
+                },
+                // 触发切换年月事件
+                emitSwitch(showDate) {
+                    this.$emit('switch', showDate);
+                },
+                // 日期点击事件
+                onDayClick(day) {
+
+                    if (!this.dayClick(day.dateTime)) {
+                        return;
+                    }
+
+                    // 清空一下 
+
+                    this.selectJJ = {
+                        m: false,
+                        a: false,
+                        n: false,
+                        //是否有事
+                        ism: false,
+                        isa: false,
+                        isn: false,
+                    }
+
+
+                    switch (this.$props.mode) {
+                        case 'single':
+                            if (!day.isSelect && !day.isDisable) {
+                                this.selectDate = day.dateTime;
+                                // 早中晚请假情况                                
+                                // 设置当前日期的请假预约事项
+                                this.setDisable(this.selectDate)
+                                this.getFullDate(this.showDate);
+                                this.emitChange();
+                            }
+                            break;
+                        // 多选
+                        case 'multiple':
+
+                            if (!day.isSelect && !day.isDisable) { //没有被选中 且  没有被禁用                                                               
+                                this.selectDate.push(day.dateTime);
+                                // console.log(this.clone_selectDate);
+                                this.getFullDate(this.showDate); //当前 页的 年月
+                                // console.log(day)                                
+                                this.emitChange();
+                            } else {
+                                // 至少剩余俩
+                                if (this.selectDate.length > 1) {
+
+                                    this.selectDate = this.selectDate.filter((item) => !item.isSame(day.dateTime));
+                                    this.getFullDate(this.showDate);
+                                    this.emitChange();
+                                }
+
+                            }
+                            break;
+                        case 'during':
+                            if (day.isDisable) return;
+                            if (this.selectDate.length === 0) {
+                                this.selectDate = [day.dateTime];
+                            } else if (this.selectDate.length === 1) {
+                                this.selectDate.push(day.dateTime);
+                                if (this.selectDate[1].isBefore(this.selectDate[0])) {
+                                    this.selectDate.reverse();
+                                }
+                            } else if (this.selectDate.length === 2) {
+                                this.selectDate = [day.dateTime];
+                            }
+                            this.getFullDate(this.showDate);
+                            this.emitChange();
+                            break;
+                    }
+                },
+                // 设置有事情况
+                setDisable(currentDate){
+                    console.log(currentDate.format('YYYY-MM-DD'))
+                    // 展示 是否预约
+                    let is_morning = false; 
+                    let is_afternoon = false; 
+                    let is_night = false;                    
+                    // 展示请假
+                    let isJia = false; // 默认没假                                        
+                    for (let i = 0; i < this.schedulesArr.length; i++) {
+                        
+                        if(currentDate.format('YYYY-MM-DD') == dayjs(this.schedulesArr[i].schedul_date).format('YYYY-MM-DD')){
+                            // 判断 早 中 晚  // 存状态                                   
+                            let db_morning = this.schedulesArr[i].morning;  //数据库 早
+                            let db_afternoon = this.schedulesArr[i].afternoon;// 数据库 中
+                            let db_night = this.schedulesArr[i].night;// 数据库 晚
+                            // 早
+                            if (db_morning == 0) { // 0
+                                this.selectJJ.ism = false
+                            }else{
+                                this.selectJJ.ism = true
+                            }
+                            //  中
+                            if (db_afternoon == 0) { // 0
+                                this.selectJJ.isa = false                                        
+                            }else{
+                                this.selectJJ.isa = true
+                            } 
+                            // 晚
+                            if (db_night == 0) { // 0
+                                this.selectJJ.isn = false
+                            }else{
+                                this.selectJJ.isn = true
+                            }
+
+                        }
+                    }
+
+                },
+                // 切换年份
+                changeYear(action) {
+                    const date = dayjs(`${this.showDate.year}-${this.showDate.month}`);
+                    let computedDate;
+                    switch (action) {
+                        case 'prev':
+                            this.translateX += 1;
+                            computedDate = date.subtract(1, 'year');
+                            break;
+                        case 'next':
+                            this.translateX -= 1;
+                            computedDate = date.add(1, 'year');
+                            break;
+                    }
+                    this.showDate = {
+                        year: computedDate.year(),
+                        month: computedDate.month() + 1,
+                    };
+                    this.emitSwitch(this.showDate);
+                    this.getFullDate(this.showDate);
+                },
+                // 切换月份
+                changeMonth(action) {
+
+
+                    const date = dayjs(`${this.showDate.year}-${this.showDate.month}`);
+                    let computedDate;
+                    switch (action) {
+                        case 'prev':
+                            this.translateX += 1;
+                            computedDate = date.subtract(1, 'month');
+                            break;
+                        case 'next':
+                            this.translateX -= 1;
+                            computedDate = date.add(1, 'month');
+                            break;
+                    }
+                    this.showDate = {
+                        year: computedDate.year(),
+                        month: computedDate.month() + 1,
+                    };
+
+                    this.emitSwitch(this.showDate);
+                    this.getFullDate(this.showDate);
+                },
+                // 暴露出去的方法：切换已选的时间
+                changeDate(date) {
+
+                    if (!dayjs(date).isValid()) {
+                        console.error('Type of parameter is invalid!');
+                    }
+                    this.init(date);
+                },
+                // 暴露出去的方法：切换当前显示的时间
+                changeDateView(date = dayjs()) {
+                    const changeDate = dayjs(date);
+
+                    this.showDate = {
+                        year: changeDate.year(),
+                        month: changeDate.month() + 1,
+                    };
+
+                    this.getFullDate(this.showDate);
+                },
+                getFullDate() {
+
+                    // 当前月;展示月;做差取合理区间
+                    // let current_M = dayjs(this.dateNow.year+'-'+this.dateNow.month);                   
+                    // let show_M    = dayjs(this.showDate.year+'-'+this.showDate.month);
+                    // let diff_M    = show_M.diff(current_M, 'month');
+                    // // 若 0 < diff_M  < 3 请求数据
+                    // if(diff_M >= 0 && diff_M < 3){
+                    //     console.log('处于显示区域');
+                    // }else{
+                    //     console.log('禁区')
+                    // }
+
+
+                    // 得到当前 年月 的 Dayjs 对象
+                    const date = dayjs(`${this.showDate.year}-${this.showDate.month}`);
+
+                    const thisDate = this.getDate(date);                      // 当月                
+                    const prevDate = this.getDate(date.subtract(1, 'month')); // 上月
+                    const nextDate = this.getDate(date.add(1, 'month'));      // 下月
+                    this.fullDate = [
+                        prevDate.fullDate,
+                        thisDate.fullDate,
+                        nextDate.fullDate,
+                    ];
+                },
+                // 当前日期是否被选中
+                isSelect(date) {
+                    let select = false;
+                    switch (this.$props.mode) {
+                        case 'single':
+                            if (this.selectDate && date.isSame(this.selectDate)) {
+                                select = true;
+                            }
+                            break;
+                        case 'multiple':
+                            if (this.selectDate.length > 0 && this.selectDate.some((item) => date.isSame(item))) {
+                                select = true;
+                            }
+                            break;
+                    }
+                    return select;
+                },
+                // 当前时间是否在selectDate之间
+                isBetting(date) {
+                    if (this.mode === 'during') {
+                        const startDate = this.selectDate[0];
+                        const endDate = this.selectDate[1];
+                        if (this.selectDate.length === 1) {
+                            return date.isSame(startDate);
+                        } else if (this.selectDate.length === 2) {
+                            return (date.isAfter(startDate) && date.isBefore(endDate)) || date.isSame(startDate) || date.isSame(endDate);
+                        }
+                    }
+                    return false;
+                },
+                getIsDisable(dateTime) {
+                    let isDisable = false;
+                    const disabledDate = this.disabledDate.map((item) => dayjs(item).startOf('day'));
+                    if (this.minDate || this.maxDate) {
+                        if (this.minDate) {
+                            const minDate = dayjs(this.minDate).startOf('day');
+                            isDisable = dateTime.isBefore(minDate);
+                        }
+                        if (!isDisable && this.maxDate) {
+                            const maxDate = dayjs(this.maxDate).endOf('day');
+                            isDisable = dateTime.isAfter(maxDate);
+                        }
+                    } else if (disabledDate.length > 0) {
+                        if (this.mode !== 'during') {
+                            isDisable = disabledDate.some((item) => item.isSame(dateTime));
+                        }
+                    }
+                    return isDisable;
+                },
+                getDate(thisDate) {
+                    // console.log(thisDate)
+                    let date = [];
+
+                    const prevDate = thisDate.subtract(1, 'month');
+                    // console.log(prevDate);                  
+                    const nextDate = thisDate.add(1, 'month');
+                    const firstDayOfWeek = thisDate.day() || 7;  // 本月第一天是周几
+
+
+                    const dayCountOfThisMonth = thisDate.daysInMonth(); // 当月天数：31
+
+                    const dayCountOfPrevMonth = prevDate.daysInMonth(); // 上个月 30
+
+                    const prevIndexOfThisMonth = firstDayOfWeek - 1;    // 
+
+
+                    // console.log(prevIndexOfThisMonth)
+
+                    const NextIndexOfThisMonth = firstDayOfWeek + dayCountOfThisMonth - 2;
+                    const disabledDate = this.disabledDate.map((item) => dayjs(item).startOf('day'));
+
+                    for (let i = 0; i < 7 * 6; i++) {
+                        // 上月
+                        if (i < prevIndexOfThisMonth) {
+                            const value = dayCountOfPrevMonth - (firstDayOfWeek - i - 2);
+                            const dateTime = prevDate.date(value);
+                            date[i] = { // 相当于 day
+                                value,
+                                dateTime,
+                                isHidden: true,
+                                isGrey: true,
+                                isToday: dateTime.isSame(dayjs().startOf('day')),
+                                isSelect: false,         // this.isSelect(dateTime)
+                                isDisable: true,    //this.getIsDisable(dateTime)
+                                isDuring: this.isBetting(dateTime),
+                            };
+
+                        }
+                        // 当月
+                        if (
+                            i >= prevIndexOfThisMonth &&
+                            i <= NextIndexOfThisMonth
+                        ) {
+                            const value = i - firstDayOfWeek + 2;
+
+                            const dateTime = thisDate.date(value);   //返回 当前日期的 Dayjs 对象
+                            
+
+                           
+                            //只要比今天时间早 或者 大于今天两个月的时间 就不让点击
+                            let dateNow_date = dayjs(this.dateNow.year + '-' + this.dateNow.month + '-' + this.dateNow.date);  //今天(最小日期)                    
+                            let Now_date = dayjs(dateTime.$y + '-' + (dateTime.$M * 1 + 1) + '-' + dateTime.$D);   //本月的每一天【i】日期    
+                            let dateMax_date = dayjs(dateNow_date).add(1, 'month').endOf('month');              //最大日期
+                            // 有效的日期点击区域
+                            // 区间内 则true  否则 false
+                            let _valid_date = Now_date.diff(dateNow_date) >= 0 && dateMax_date.diff(Now_date) >= 0;
+                            let _fobidden = true;
+                            if (_valid_date) {    // 区间内 不禁用 
+                                _fobidden = false
+                            } else {              // 区间外  禁用
+                                _fobidden = true
+                            }
+
+                            date[i] = {
+                                value,
+                                dateTime,
+                                isGrey: _fobidden,
+                                isHidden: false,
+                                isToday: dateTime.isSame(dayjs().startOf('day')),
+                                isSelect: this.isSelect(dateTime),
+                                isDisable: _fobidden,    // this.getIsDisable(dateTime)
+                                isDuring: this.isBetting(dateTime),
+
+                            };
+
+                        }
+                        // 下月
+                        if (i > NextIndexOfThisMonth) {
+                            const value = i - firstDayOfWeek - dayCountOfThisMonth + 2;
+                            const dateTime = nextDate.date(value);
+                            date[i] = {
+                                value,
+                                dateTime,
+                                isGrey: true,
+                                isHidden: true,
+                                isToday: dateTime.isSame(dayjs().startOf('day')),
+                                isSelect: false,      // this.isSelect(dateTime)
+                                isDisable: true, // this.getIsDisable(dateTime)
+                                isDuring: this.isBetting(dateTime),
+                            };
+                        }
+
+                    }
+                    // 设置 所有的日期
+                    const fullDate = [];
+                    for (let i = 0; i < 6; i++) {
+                        fullDate.push(date.slice(i * 7, (i + 1) * 7));
+                    }
+
+                    // let oneLevel_fullDate = [].concat.apply([], fullDate);
+                    // console.log(oneLevel_fullDate);
+                    return {
+                        fullDate,
+                    };
+                },
+                // 确认
+                confirm_jia() {
+                    // 先清空  
+                    let arr = [];
+                    // 判断早中晚 是否选中
+                    let obj = {
+                        m: 0,
+                        a: 0,
+                        n: 0
+                    }
+                    
+                    for (let i in this.selectJJ) {
+                        if (this.selectJJ[i]) {
+                            
+                            arr.push(i)
+                            obj[i] = 1
+                        }
+                    }
+                    console.log(arr)
+                    // 清空 多余
+                    for(let j=0 ; j<arr.length; j++){                        
+                        if(arr[j]=='ism'){
+                            arr.splice(j,1)
+                        }
+                        if(arr[j]=='isa'){
+                            arr.splice(j,1)
+                        }
+
+                        if(arr[j]=='isn'){
+                            arr.splice(j,1)
+                        }
+                    }
+                    
+                    if (arr.length > 0) {
+
+                        // 日期参数
+                        let _date = dayjs(this.selectDate).format('YYYY-MM-DD 00:00:00')
+                        let param = {
+                            date: _date,
+                            morning: obj.m,
+                            afternoon: obj.a,
+                            night: obj.n
+                        }
+                        
+                        // 判断 android 还是 ios 
+                        if (isAndroid) { // 安卓
+                            App.chooseDate(JSON.stringify(param));
+
+                        } else if (isIOS) { // 苹果
+
+                            this.sendData(JSON.stringify(param));
+                        }
+                    } else {
+                        this.messageTip('请选择项目')
+                    }
+
+
+
+                },
+                // 加载ios路径
+                sendData(param) {
+                    window.location.href = "ios:xxx?" + param;
+                },
+                // 提示信息
+                messageTip(content) {
+                    this.$createDialog({
+                        type: 'alert',
+                        title: '角落里',
+                        content: content,
+                        // icon: 'cubeic-alert'
+                    }).show()
+                },
+                /**
+                 * 调用原生的默认接受方法
+                 */
+                handleInit(info) {
+                    window.setupWebViewJavascriptBridge(bridge => {
+                        bridge.send(info, (data) => {
+                            message.success(data);
+                        })
+                    })
+                },
+                // 根据 data中的 state_jia 的状态 来定
+                onJiaClick(when) {
+                    // 是否选中之前 先 看看是否请假了
+                    if(!this.selectJJ['is'+when]){
+                        this.selectJJ[when] = !this.selectJJ[when]
+                    }
+                
+                },
+                // 获取后台有事的数据
+                getEventData() {
+                    // 获取 token
+                    // getToken();
+                    const startDateRange = dayjs().format('YYYYMM');
+                    const middleDateRange = dayjs().add(1, 'month').format('YYYYMM');
+                    const dateRange = startDateRange + ',' + middleDateRange;
+                    // console.log(dateRange);
+                    // 创建参数对象
+                    let param = {
+
+                        url: 'http://192.168.1.167:6868/api/travelerInfo/selectGuiderSchedul',
+                        data: {
+                            customid: '100000009',
+                            schedul_month: dateRange
+                        }
+                    }
+                    this.showVisible = true
+                    // 异步获取后台日期数据  
+                    myAjax(param).then(res => {
+                        if (res.code == '0000') {
+
+                            this.schedulesArr = res.data.travelerSchedulList;
+                            // console.log(this.schedulesArr)
+                            this.init();
+                            this.showVisible = false
+                        } else {
+
+                        }
+
+                    }).catch(err => {
+
+                    })
+                }
+            }
+
+        });
+
+
+
+
+    </script>
+</body>
+
+</html>

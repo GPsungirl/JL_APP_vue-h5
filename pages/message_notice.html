@@ -1,0 +1,186 @@
+<!-- 系统通知列表 -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>系统通知列表</title>
+    <link rel="stylesheet" type="text/css" href="css/reset.css">
+    <link rel="stylesheet" type="text/css" href="css/common.css">
+    <link rel="stylesheet" type="text/css" href="css/resetIndex.css">
+    <!-- vant ui -->
+    <link rel="stylesheet" type="text/css" href="css/vant.css">
+    <style>
+        /* 修正一下van-cell 的下划线 100% */
+        .van-cell:not(:last-child)::after {
+            position: absolute;
+            box-sizing: border-box;
+            content: ' ';
+            pointer-events: none;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            border-bottom: 1px solid #ebedf0;
+            -webkit-transform: scaleY(.5);
+            transform: scaleY(.5);
+        }
+
+        [v-cloak] {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="bussinessDeal_notice" class="pad_15" v-cloak>
+        <div v-if="havaDatas">
+            <van-list v-model="loading" :finished="finished" finished-text="没有更多了" @load="onLoad">
+                <div class="box_shadow_toGuider min_h100 pad_10 mar_b24" v-for="item in list" :key="item.noticeid">
+                    <div class="van-cell van-field busi_title">
+                        <div class="">
+                            <span class="circle_tip verti_middle notice_tip"
+                                :class="{unreaded:item.notice_status == 1}"></span>
+                            <span class="tip_color verti_middle">{{item.notice_title}}</span>
+                        </div>
+                        <div class="date_color ">{{ item.notice_time }}</div>
+                    </div>
+                    <div class="van-cell van-field content_color">
+                        <div class="over_txt_hidden">
+                            {{ item.notice_content }}
+                        </div>
+
+                    </div>
+                    <div class=" van-cell van-field view_detail_color" @click="goDetail(item.noticeid)">查看详情 ></div>
+                </div>
+
+            </van-list>
+        </div>
+        <div v-else class="no_notice_wrap">
+            <img src="img/notice_null.png" alt="">
+            <p class="no_notice">暂无消息</p>
+        </div>
+    </div>
+    <script src="js/jquery.js"></script>
+    <script src="js/rem.js"></script>
+    <script src="vue-mobile-calendar/vue.js"></script>
+    <!-- 私有 -->
+    <script src="js/common.js"></script>
+    <script src="js/utils.js"></script>
+    <!-- vant -->
+    <script src="js/vant.js"></script>
+    <script>
+        if (!window.Promise) {
+            document.write(
+                '<script src="//cdn.jsdelivr.net/npm/es6-promise@4.1.1/dist/es6-promise.min.js"><\/script><script>ES6Promise.polyfill()<\/script>'
+            )
+        }
+    </script>
+    <script>
+        let vm = new Vue({
+            el: '#bussinessDeal_notice',
+            data: {
+                havaDatas:true,
+                list: [],
+                loading: false,
+                finished: false,
+                page_num: 0,
+                commonURL: ''
+            },
+            created() {
+                // 格式化日期
+                this.formatDate();
+
+                this.getCommonURL();
+                getToken();
+            },
+            methods: {
+                //获取 commonURL
+                getCommonURL() {
+                    var url_id = ''
+                    var commonURL1 = window.location.search;
+                    //console.log(header_token);
+                    commonURL1 = commonURL1.slice(1).split('&'); // 285 637需要用到
+                    for (var item of commonURL1) {
+                        if (item.indexOf('commonURL') > -1) {
+                            url_id = item.split('=')[1]
+                        }
+                    }
+                    this.commonURL = 'http://' + url_id;
+                },
+                // 加载数据
+                onLoad() {
+                    this.page_num = this.page_num + 1
+                    // 异步更新数据
+                    let param = {
+
+                        header_token: header_token,
+                        url: this.commonURL + '/api/notice/selectSysPushMsgList', //this.commonURL
+                        data: {
+                            page_count: '10',
+                            page_num: this.page_num,
+                            // 交易类型 1交易通知 2行程通知 3系统通知
+                            type: '3',
+                        }
+                    }
+                    myAjax(param).then(res => {
+
+                        if (res.code === '0000') {
+                            let resultList = res.data.SysPushMsgList
+                            for (let i = 0; i < resultList.length; i++) {
+                                let oldTime = new Date(resultList[i].notice_time).getTime();
+                                // 处理日期
+                                resultList[i].notice_time = new Date(oldTime).format("yyyy-MM-dd")
+                                this.list.push(resultList[i])
+                            }
+                            this.loading = false
+                            // 空数据时显示图片
+                            if (this.list.length == 0) {
+                                this.havaDatas = false
+                            }
+                            // 判断数据库里还有吗
+                            if (this.list.length >= res.page.page_total) {
+                                this.finished = true;
+                            }
+                        } else {
+
+                        }
+                    }).catch(err => console.log(err))
+
+                },
+                // 跳转详情页
+                goDetail(noticeid) {
+
+                    window.location.href = './message_detail.html?noticeid=' + noticeid + '&type=3'
+                },
+                // 格式化日期
+                formatDate() {
+                    Date.prototype.format = function (fmt) {
+                        var o = {
+                            "M+": this.getMonth() + 1,                 //月份 
+                            "d+": this.getDate(),                    //日 
+                            "h+": this.getHours(),                   //小时 
+                            "m+": this.getMinutes(),                 //分 
+                            "s+": this.getSeconds(),                 //秒 
+                            "q+": Math.floor((this.getMonth() + 3) / 3), //季度 
+                            "S": this.getMilliseconds()             //毫秒 
+                        };
+                        if (/(y+)/.test(fmt)) {
+                            fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+                        }
+                        for (var k in o) {
+                            if (new RegExp("(" + k + ")").test(fmt)) {
+                                fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+                            }
+                        }
+                        return fmt;
+                    }
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>
