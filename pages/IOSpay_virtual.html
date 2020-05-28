@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- 贝壳充值-ios端 -->
     <meta charset="UTF-8">
     <meta name="viewport"
         content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>VIPpay</title>
+    <title>贝壳充值</title>
     <link rel="stylesheet" href="../css/reset.css">
     <link rel="stylesheet" href="../css/common.css">    
     <!-- vant ui -->
@@ -33,41 +34,46 @@
 
 <body>
     
-    <div id="payVip" v-cloak>
+    <div id="pay" v-cloak>
         
         <!-- 顶部 -->
-        <div class="pay_gradient pay_vip ">
-            <div class="vip_face"><img :src="userImgUrl" alt=""/></div>
-            <div class="vip_name">
-                <span class="u_name">{{ username }}</span>
-                <span class="u_descri">{{ isVip }}</span>
+        <div class="pay_gradient pay_shell ">
+            <div class="yue">账户余额</div>
+            <div>
+                <span class="account_no">{{ account_no }}</span>
+                <span class="font12" style="color:#fff;">贝壳</span>
             </div>
-
         </div>
         <!-- 充值 -->
         <div class="recharge pad_15 pay_item" style="padding-bottom:0px">
-            
-            <div class="vip_content">
+            <h5>请选择充值金额</h5>
+            <div class="pi_content">
                 <div>
-                    <div v-for="(item,index) in vipNum" 
-                        :key="index"                          
-                        class="vip_son"
-                        @click="selectMoney(index)"
+                    <div v-for="(item,index) in rechargeNum" 
+                        :key="index" 
+                        @click="selectMoney(index)" 
                         :class="{selected:index === curIndex}"
                         >
-                        <p class="p_year">{{ item.year }}</p>
+                        <p class="p_shell">{{ item.shell }}</p>
                         <p class="p_money">￥{{ item.money }}</p>
-                        <!-- <div>
-                            <p class="p_txt">￥{{ item.txt }}</p>
-                        </div> -->
-                        
                     </div>                                   
-                    
+                    <div @click="selectOther"
+                         
+                         :class="{selected:moneyIsSelect}">
+                        <!-- <p class="otherNum">其他数量</p>   -->
+                        <input 
+                            :type="inpu_type" 
+                            @input="writeM"
+                            
+                            @blur="otherNumBlur"
+                            v-model="otherNum" class="otherNum">  
+                        <p class="txt_js">（10的倍数）</p>                    
+                    </div>
                 </div>
             </div>
         </div>
         <!-- 支付 -->
-        <!-- <div class="payment pad_15 pay_item" style="padding-top:4px;">
+        <div class="payment pad_15 pay_item" style="padding-top:4px;padding-bottom:0;">
             <h5>请选择支付方式</h5>
             <div class="pay_type">
                 <div v-for="(item, index) in payOrigin"
@@ -79,23 +85,15 @@
                 </div>                
             </div>
             <p class="pay_txt">充值成功后，到账可能会有一定延迟，请您耐心等待。</p>
-        </div> -->
+        </div>
         <!-- 底部支付 -->
-        <div class="footer_pay vip_pay">            
-            <van-button class="f_pay vip_gradient" @click="goPay" type="default">立即开通</van-button>            
+        <div class="footer_pay">
+            <p class="showM" style="margin-top:0;margin-bottom:0.08rem;">{{ payData.money }}</p>
+            <van-button class="f_pay gradient" @click="goPay" type="default">立即支付</van-button>
+
+            
         </div>
-        <!-- vip特权 -->
-        <h5 class="vip_tqu">vip特权</h5>
-        <div class="vip_right">
-            <div 
-                v-for="(item,index) in vipDescris"
-                class="vip_item"
-                >
-                <img :src="item.vipImg" alt="">
-                <h6>{{ item.title}}</h6>
-                <p>{{item.txt}}</p>
-            </div>
-        </div>
+        
         <!-- 加载中 -->
         <van-loading v-show="showVisible" color="#1989fa" type="spinner" size="48px" vertical>加载中...</van-loading>
         <van-overlay :show="showVisible"  ></van-overlay>
@@ -119,77 +117,62 @@
     </script>
     <script>
         let vm = new Vue({
-            el: '#payVip',
+            el: '#pay',
             data: {
-                username:'陈平安',
-                userImgUrl:'../img/pic_head.png',
-                isVip:'普通会员',
+                account_no:'',
                 showVisible:false,
-                
                 // 所需后台传递的参数
                 // 100133
                 userid:'',
-                // http://218.201.112.39:6868
+                // http://39.100.106.23:80
                 commonURL:'',
 
                 // 当前选中的index
                 curIndex:0,
                 payIndex:-1,
-                vipNum:[
+                rechargeNum:[
                     {
-                        id:0,
-                        month:'6',
-                        year:'六个月',
-                        money:'588',
-                        
+                        shell:'60贝壳',
+                        money:'6.00'
                     },
                     {
-                        id:1,
-                        month:'3',
-                        year:'三个月',
-                        money:'368',
-                        
+                        shell:'300贝壳',
+                        money:'30.00'
                     },
                     {
-                        id:2,
-                        month:'1',
-                        year:'一个月',
-                        money:'148',
-                        
+                        shell:'980贝壳',
+                        money:'98.00'
+                    },
+                    {
+                        shell:'1880贝壳',
+                        money:'188.00'
+                    },
+                    {
+                        shell:'3280贝壳',
+                        money:'328.00'
                     }
+                    
                 ],
                 // 支付方式
                 payOrigin:[
                     
+                    // {
+                    //     imgUrl:'img/alipay.png',
+                    //     txt:'支付宝支付'
+                    // },
                     {
-                        imgUrl:'img/alipay.png',
-                        txt:'支付宝支付'
-                    },
-                    {
-                        imgUrl:'img/wechatPay.png',
+                        imgUrl:'../img/wechatPay.png',
                         txt:'微信支付'
                     },
                 ],
-                               
+                // 其他数量
+                otherNum:'其他数量',
+                inpu_type:'text',
+                // 是否选中 充值金额
+                shellIsSelect:false,
+                moneyIsSelect:false,
                 // 是否选中 支付方式
-                // payIsSelect: false,
-                vipDescris:[
-                    {
-                        vipImg:'../img/icon_1.png',
-                        title:'无限畅聊',
-                        txt:'与所有角落向导无限畅聊'
-                    },
-                    {
-                        vipImg:'../img/icon_2.png',
-                        title:'私密信息免费看',
-                        txt:'查看所有角落向导信息和照片'
-                    },
-                    {
-                        vipImg:'../img/icon_3.png',
-                        title:'增加魅力值',
-                        txt:'工作间进入特效弹幕优先看'
-                    },
-                ],
+                payIsSelect: false,
                 // 收集数据
                 payData:{
                     // 充值金额
@@ -198,37 +181,23 @@
                     payType:'',
                 },
                 
-
             },
             created(){
-                // 获取token
-                // this.getToken();
+                // 获取贝壳余额
+                // this.account_no = getMoney();
+                // 获取url userid
                 this.getCommonURL();
-                // 获取用户信息
+                // 获取贝壳余额
                 this.getVipData();
-                // 获取url参数
-                //this.getVipData();
-                //this.account_no = getMoney();
                 // 初始化 money                
-                
+                this.payData.money = '￥'+ this.rechargeNum[0].money
             },
             methods:{
-                // 获取token
-                getToken() {
-                    var token_id = ''
-                    var  header_token1 = window.location.search;
-                    header_token1 = header_token1.slice(1).split('&'); // 285 637需要用到
-                    for(var item of header_token1){
-                        if(item.indexOf('token')>-1){
-                            token_id = item.split('=')[1]
-                        }
-                    }
-                    header_token = token_id
-                },
                 // 获取到commonurl 和 userid
                 getCommonURL() {      
                     let _userid='';
                     let _commonurl = '';
+                    let _money='';
                     var commonURL1 = window.location.search;
                     // ?userid=1111&comingurl=pay.arkcorner.com  ["userid=1111", "comingurl=pay.arkcorner.com"]
                     commonURL1 = commonURL1.slice(1).split('&'); 
@@ -241,13 +210,18 @@
                         if(item.indexOf('userid')>-1){
                             _userid = item.split('=')[1]
                         }
+                        // 获取money
+                        // if(item.indexOf('money')>-1){
+                        //     _money = item.split('=')[1]
+                        // }
                     }
                     this.userid = _userid;
                     this.commonURL = 'http://'+_commonurl;
-
+                    this.account_no = _money;
 
                     // alert(this.userid);
                     // alert(this.commonURL);
+                    // alert(this.account_no);
                 },
                 // 获取数据
                 getVipData(){
@@ -260,15 +234,8 @@
                     }
                     this.showVisible = true
                     myAjax(param).then(res=>{                    
-                        if(res.code == '0000'){                                                                                                          
-                            //   名字 会员 头像
-                            if(res.data.member_status == 1){
-                                this.isVip = '普通会员'
-                            }else{
-                                this.isVip = '超级会员'
-                            }
-                            this.username = res.data.nickname
-                            this.userImgUrl = res.data.headurl
+                        if(res.code == '0000'){                                                                                                                                      
+                            this.account_no = res.data.app_openid;
                             this.showVisible = false
                         }else{
                             this.showVisible = false;
@@ -284,7 +251,35 @@
                 selectMoney(p){
                     this.curIndex = p;
                     this.moneyIsSelect = false;
-                },                             
+                    
+                    this.inpu_type = 'text';
+                    this.otherNum = '其他数量';
+                    // 获取数据
+                    this.payData.money = '￥'+ this.rechargeNum[p].money
+                    
+                   
+                },
+                // 选择其他
+                selectOther(e){
+                    // 确保所有都没选中
+                    this.curIndex = -1;
+                    this.moneyIsSelect = true;
+                    this.inpu_type = 'number';
+                    // 金额
+                    this.payData.money = ''
+                },
+                // 输入其他数量 失去焦点
+                otherNumBlur(){
+                    //this.payData.money =  this.otherNum / 10;
+                    
+                },
+                writeM(e){
+                    if(e.target.value % 10 == 0){
+                        this.payData.money = '￥'+ (e.target.value / 10) +'.00'
+                    }else{
+                        this.payData.money = '￥'+ (e.target.value / 10) 
+                    }                                        
+                },
                 // 支付方式
                 handlePaytype(i){
                     this.payIndex = this.payData.payType= i;
@@ -292,28 +287,48 @@
                 },
                 // 立即支付
                 goPay(){
-                    
-                    let _data  = this.vipNum[this.curIndex]
-                    // console.log(_data)
-                    // console.log(this.vipNum[this.curIndex])
+                    let copayMoney =  Number(this.payData.money.slice(1));                    
+                    // 判断 支付方式                     
+                    if(this.payData.payType === ''){   
+
+                        this.$toast('请选择支付方式');                       
+                        return
+                    }
+                    // GP
+                    // 金额大于1元
+                    if(typeof copayMoney != 'number' || copayMoney < 1){
+                        this.$toast('充值金额最少10贝壳');                       
+                        return
+                    }
+                    // 判断 金额是否符合格式 (整数 )
+                    if(typeof copayMoney != 'number' || copayMoney %1 != 0){
+                        this.$toast('充值金额必须为10的整数倍');                       
+                        return
+                    }
+
+                    // 调用支付
+                    if(copayMoney == 0){
+                        this.$toast('请选择金额');                       
+                        return
+                    }
+                    // console.log(copayMoney*100) 
+                    // console.log(this.payData.payType+1)
                     let param = {
-                        reqcustom: this.userid,                        
+                        // header_token:'',
+                        reqcustom: this.userid,
                         url: this.commonURL + '/api/account/rechargeVirtual',
                         data: {
-                            memberPrice:_data.money*100, //this._data.money*100
-                            monthNum:this._data.month,
-                            payType:'2',                            
+                            money:copayMoney*100,
+                            payType:2,//this.payData.payType+1
                         }
-                    }
-                    
+                    }                    
                     this.showVisible = true
                     
                     webAjax(param).then(res=>{
                         // alert(JSON.stringify(res))
                         if(res.code == '0000'){
-                            
-                            this.showVisible = false                                                        
-                            window.location.href = res.data.payRequest  ;                                                                                                           
+                            this.showVisible = false                                                                                    
+                            window.location.href = res.data.payRequest                                                                                                          
                         }else{
                             this.showVisible = false;
                             this.$toast(res.data.msg);

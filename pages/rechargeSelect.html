@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>充值选择</title>
+    <link rel="stylesheet" type="text/css" href="../css/reset.css">
+    <link rel="stylesheet" type="text/css" href="../css/common.css">
+    <link rel="stylesheet" type="text/css" href="../css/resetIndex.css">
+    <style>
+        .bg_gradient {
+            background: -moz-linear-gradient(left, #FA8D84 0%, #FD9AB6 76%, #87C0F5 100%);
+            background: -webkit-gradient(linear, left, right, color-stop(0%, #FA8D84), color-stop(76%, #FD9AB6), color-stop(100%, #87C0F5));
+            background: -webkit-linear-gradient(left, #FA8D84 0%, #FD9AB6 76%, #87C0F5 100%);
+            background: -o-linear-gradient(left, #FA8D84 0%, #FD9AB6 76%, #87C0F5 100%);
+            background: -ms-linear-gradient(left, #FA8D84 0%, #FD9AB6 76%, #87C0F5 100%);
+            background: linear-gradient(to right, #FA8D84 0%, #FD9AB6 76%, #87C0F5 100%);
+            height: 1.8rem;
+            padding-top: 0.3rem;
+        }
+
+        .recharge_select {
+            background-color: #fff;
+            position: fixed;
+            top: 0.76rem;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            border-top-left-radius: 0.1rem;
+            border-top-right-radius: 0.1rem;
+            padding-top: 0.3rem;
+        }
+
+        .recharge_item {
+            width: 93%;
+            margin: auto;
+            margin-bottom: 0.37rem;
+            display: block;
+        }
+
+        .recharge_item img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .re_title {
+            color: #fff;
+            text-align: center;
+            font-size: 0.18rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="rechargeSelect">
+        <div class="bg_gradient">
+            <h2 class="re_title">充值选择</h2>
+        </div>
+        <div id="" class=" recharge_select">
+            <div class="min_h100 pad_10 mar_b24 ">
+                <a :href="memberUrl" class="recharge_item">
+                    <img src="../img/re_member.png" alt="">
+                </a>
+                <a :href="rechargeUrl" class="recharge_item">
+                    <img src="../img/re_virtual.png" alt="">
+                </a>
+            </div>
+        </div>
+    </div>
+    <script src="../js/jquery.js"></script>
+    <script src="../js/rem.js"></script>
+    <script src="../vue-mobile-calendar/vue.js"></script>
+    <script>
+        if (!window.Promise) {
+            document.write(
+                '<script src="//cdn.jsdelivr.net/npm/es6-promise@4.1.1/dist/es6-promise.min.js"><\/script><script>ES6Promise.polyfill()<\/script>'
+            )
+        }
+    </script>
+    <script>
+        let vm = new Vue({
+            el: '#rechargeSelect',
+            data: {
+                rechargeUrl: 'IOSpay_virtual.html',
+                memberUrl: 'payVIP.html'
+            },
+            created() {
+                // 拼接url
+                this.getCustomid();
+            },
+            methods: {
+                getCustomid() {                    
+                    var customid = window.location.search;                    
+                    this.rechargeUrl+=customid;
+                    this.memberUrl+=customid;                    
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>

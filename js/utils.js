@@ -51,7 +51,28 @@ function myAjax(param){
         })
     })
 }
-
+// 浏览器充值
+function webAjax(param){
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            headers: {
+                reqcustom: param.reqcustom,
+                
+            },               
+            contentType: 'application/json',
+            type: 'POST',
+            url: param.url,  // param 2
+            data: param.data?JSON.stringify(param.data):null,  // param 3
+            dataType: 'json',
+            success(res) {
+                resolve(res)
+            },
+            error(err) {
+                reject(err)
+            }
+        })
+    })
+}
 // 分享
 function myAjax2(param){
     return new Promise((resolve, reject) => {
