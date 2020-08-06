@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>贝壳兑换</title>
+    <link rel="stylesheet" href="../css/reset.css">
+    <link rel="stylesheet" href="../css/common.css">
+    <!-- vant ui -->
+    <link rel="stylesheet" href="../css/vant.css">
+    <style>
+        [v-cloak] {
+            display: none !important;
+        }
+
+        .van-loading {
+            position: fixed;
+            top: 50%;
+            margin-top: -38px;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .van-loading__text {
+            color: #1989fa;
+        }
+
+        .van-overlay {
+            background-color: rgba(255, 255, 255, .7);
+        }
+
+        .exchangeM {
+            height: 100vh;
+            background-color: #FAFAFA;
+            text-align: center;
+        }
+
+        .exc_title {
+            height: 0.44rem;
+            line-height: 0.44rem;
+            margin-bottom: 0.175rem;
+            background-color: #fff;
+        }
+
+        .exc_title h4 {
+            font-size: 0.16rem;
+            color: #000;
+            font-weight: 500;
+        }
+
+        .exc_wrap {
+            width: 3.62rem;
+            margin: auto;
+            min-height: 3.47rem;
+            border-radius: 0.1rem;
+            background-color: #fff;
+            box-shadow: 0 2px 5px 0px #DDE1F1;
+        }
+
+        .exc_content {
+            width: 3.62rem;
+            height: 1.12rem;
+            color: #fff;
+            background: url('../img/exc.png') no-repeat center center;
+            background-size: 100% 100%;
+        }
+
+        .exc_content .top {
+            height: 100%;
+        }
+
+        .exc_content .top h6 {
+            font-size: 0.14rem;
+            font-weight: 400;
+            padding: 0.06rem 0;
+        }
+
+        .exc_content .top .acc {
+            font-size: 0.42rem;
+        }
+
+        .rules {
+            width: 0.84rem;
+            height: 0.2rem;
+            line-height: 0.2rem;
+            border-radius: 0.1rem;
+            background-color: #7E9DE1;
+            font-size: 0.12rem;
+            margin: auto;
+            font-family: 'PingFangSC-Regular';
+        }
+
+        .middle_exc {
+            width: 96%;
+            height: 0.63rem;
+            line-height: 0.63rem;
+            margin: auto;
+            border-radius: 0.04rem;
+            background-color: #F2F2F2;
+            font-size: 0.12rem;
+        }
+
+        input::-webkit-input-placeholder {
+            color: #FB705B;
+        }
+
+        input::-moz-input-placeholder {
+            color: #FB705B;
+        }
+
+        input::-ms-input-placeholder {
+            color: #FB705B;
+        }
+
+        .middle_exc input {
+            border: none;
+            outline: none;
+            background-color: #F2F2F2;
+            color: #FB705B;
+            font-size: 0.14rem;
+            padding-left:0.04rem;
+            height:0.16rem;
+            line-height: 0.16rem;
+            display: inline-block;
+            vertical-align: middle;
+            /* 修正input */
+            min-width: 0.1rem;
+            width:0.6rem;
+        }
+
+        .mi_wrap {
+            padding-top: 0.43rem;
+        }
+
+        .footer_exc {
+            width: 96%;
+            margin: auto;
+            height: 0.44rem;
+            line-height: 0.44rem;
+            border-radius: 0.22rem;
+            font-size: 0.16rem;
+            color: #fff;
+            margin-top: 0.6rem;
+        }
+
+        /* 渐变色 */
+        .footer_exc {
+            background: -moz-linear-gradient(left, #A28FF2 0%, #8FBCF5 100%);
+            background: -webkit-gradient(linear, left, right, color-stop(0%, #A28FF2), color-stop(100%, #8FBCF5));
+            background: -webkit-linear-gradient(left, #A28FF2 0%, #8FBCF5 100%);
+            background: -o-linear-gradient(left, #A28FF2 0%, #8FBCF5 100%);
+            background: -ms-linear-gradient(left, #A28FF2 0%, #8FBCF5 100%);
+            background: linear-gradient(to right, #A28FF2 0%, #8FBCF5 100%);
+        }
+
+        .jins1 {
+            min-width: 0.2rem;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .middle_exc span{
+            height:0.16rem;
+            line-height: 0.16rem;
+            display: inline-block;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="exchangeM" class="exchangeM" v-cloak>
+        <!-- 标题 -->
+        <div class="exc_title">
+            <h4>贝壳提现</h4>
+        </div>
+        <div class="exc_wrap">
+            <!-- 上 -->
+            <div class="exc_content">
+                <!-- <img src="../img/exc.png" alt=""> -->
+                <div class="top">
+                    <h6>贝壳数量</h6>
+                    <p class="acc">{{ virtualAcount }}</p>
+                    <p class="rules">12贝壳 = 1元</p>
+                </div>
+
+            </div>
+            <!-- 中 -->
+            <div class="mi_wrap">
+                <div class="middle_exc">
+                    
+                    <span class="jins1" >{{ money }}</span>
+                    <span>金额(元)</span>
+                    <span>= </span>                    
+                    <input type="number" v-model="virtualW" placeholder="输入贝壳" />
+                    
+                </div>
+            </div>
+            <!-- 下 -->
+            <div class="footer_exc" @click="exchangemoney">
+                确认提现
+            </div>
+        </div>
+
+        <!-- 加载中 -->
+        <van-loading v-show="showVisible" color="#1989fa" type="spinner" size="48px" vertical>加载中...</van-loading>
+        <van-overlay :show="showVisible"></van-overlay>
+        <!-- 提示 -->
+        <van-dialog id="van-dialog"></van-dialog>
+    </div>
+
+    <script src="../js/rem.js"></script>
+    <script src="../js/jquery.js"></script>
+    <script src="../js/vue.js"></script>
+    <script src="../js/utils.js"></script>
+    <!-- vant -->
+    <script src="../js/vant.js"></script>
+    <script src="../js/common.js"></script>
+    <script>
+        if (!window.Promise) {
+            document.write(
+                '<script src="//cdn.jsdelivr.net/npm/es6-promise@4.1.1/dist/es6-promise.min.js"><\/script><script>ES6Promise.polyfill()<\/script>'
+            )
+        }
+    </script>
+    <script>
+        let vm = new Vue({
+            el: '#exchangeM',
+            data: {
+
+                showVisible: false,
+                virtualAcount: 0,
+
+                virtualW: '',
+                // 所需后台传递的参数
+                // 100133
+                userid: '100024',
+                // http://218.201.112.39:6868
+                commonURL: 'http://192.168.1.177:6868',
+
+
+            },
+            created() {
+                this.getCommonURL();                
+                this.getVipData();         
+            },
+            computed: {
+                money: function () {
+
+                    var modiV = this.virtualW / 12;
+
+                    return this.modiM(modiV);
+                }
+            },
+            methods: {
+
+                // 获取到commonurl 和 userid
+                getCommonURL() {
+                    let _userid = '';
+                    let _commonurl = '';
+                    var commonURL1 = window.location.search;
+                    // ?userid=1111&comingurl=pay.arkcorner.com  ["userid=1111", "comingurl=pay.arkcorner.com"]
+                    commonURL1 = commonURL1.slice(1).split('&');
+                    for (var item of commonURL1) {
+                        // 获取url
+                        if (item.indexOf('comingurl') > -1) {
+                            _commonurl = item.split('=')[1]
+                        }
+                        // 获取userid
+                        if (item.indexOf('userid') > -1) {
+                            _userid = item.split('=')[1]
+                        }
+                    }
+                    this.userid = _userid;
+                    this.commonURL = 'http://' + _commonurl;
+
+
+                    alert(this.userid);
+                    alert(this.commonURL);
+                },
+                // 获取数据
+                getVipData() {
+                    let param = {
+                        header_token: '',
+                        url: this.commonURL + '/api/custom/checkCustomInfo',
+                        data: {
+                            customid: this.userid
+                        }
+                    }
+                    this.showVisible = true
+                    myAjax(param).then(res => {
+                        console.log(res)
+                        if (res.code == '0000') {
+                            // 贝壳数量
+                            this.virtualAcount = res.data.app_openid;
+                            console.log(res.data.app_openid)
+                            this.showVisible = false
+
+                        } else {
+                            this.showVisible = false;
+                            this.$toast(res.data.msg)
+                        }
+
+                    }).catch(err => {
+                        console.log(err)
+
+                    })
+                },
+                resetData() {
+                    this.virtualW = '';
+                },
+                // 保留两位不四舍五入
+                modiM(num) {
+                    var MN = '';
+                    if (!this.virtualW) {
+                        MN = ''
+                    } else {
+                        var num2 = num.toFixed(3);
+                        num2 = num2.toString();
+                        MN = num2.slice(0, num2.lastIndexOf('.') + 3);
+
+                    }
+                    return MN;
+                },
+
+                // 立即支付
+                exchangemoney() {
+
+
+
+                    let param = {
+                        reqcustom: this.userid,
+                        url: this.commonURL + '/api/account/virtualToAccount',
+                        data: {
+                            money: this.money * 100,
+                            virtual: this.virtualW,
+
+                        }
+                    }
+
+                    this.showVisible = true
+
+                    webAjax(param).then(res => {
+
+                        if (res.code == '0000') {
+
+                            this.showVisible = false
+                            this.$toast(res.msg);
+                            this.virtualW = ''
+                            // 重新请求最新贝壳余额
+                            this.getVipData();
+                        } else {
+                            this.showVisible = false;
+                            this.$toast(res.msg);
+                        }
+
+                    }).catch(err => {
+                        console.log(err)
+                    })
+
+                },
+
+            }
+        })
+    </script>
+</body>
+
+</html>

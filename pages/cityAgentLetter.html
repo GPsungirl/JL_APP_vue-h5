@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>致加盟商一封信</title>
+    <title>致城市代理商的一封信</title>
     <link rel="stylesheet" href="../css/vant.css">
     <link rel="stylesheet" href="../css/reset.css">
     <link rel="stylesheet" href="../css/common.css">
@@ -44,27 +44,19 @@
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;成为代理商后我们为您准备了成熟的运营方案以及市场推广方案。目前推广期仅需一万元即可成为永久代理商，更有推荐主播免保证金，享受当地广告收入等收益，代理商覆盖省会城市后，代理费即涨至五万元。了解更多收益及分润形式，请联系我们
             </p>
             <h4 class="l_title1 title1 red_con">
-                电话：0532-88903698    微信：17561681223
+                电话：0532-88903698    微信：17561681210
             </h4>
-            <div id="confirm_btn" class="confirm_btn join_gradient l_title2">
+            <!-- <div id="confirm_btn" class="confirm_btn join_gradient l_title2">
                 立即加入
-            </div>
+            </div> -->
         </div>
     </div>
     <script src="../js/rem.js"></script>
     <script src="../js/vue.js"></script>
-    <script src="../js/vant.js"></script>
+    <script src="../js/vant.js"></script>    
     <script>
         // 立即加入 跳往电话
         window.onload = function () {
-            // 尝试提示
-            var Vue = window.Vue;
-            var vant = window.vant;
-            // 注册 Lazyload 组件
-            Vue.use(vant.Lazyload);
-            // 调用函数式组件
-            //vant.Toast('提示');
-            
             // 这里根据移动端原生的 userAgent 来判断当前是 Android 还是 ios
             var u = navigator.userAgent;
             // Android终端
@@ -75,21 +67,14 @@
 
             var confirm_btn = document.getElementById('confirm_btn');
             confirm_btn.addEventListener('click', function () {
-                // 先判断 是否已经是向导
-                if ('') {
-                    if (isAndroid) {
-                        App.chooseDate('tobeguide');
-                    } else if (isIOS) {
-                        appJs.clickDetermine('tobeguide');
-                    }
-                }else{
-                    vant.Toast('您已经是一名向导');
+                if (isAndroid) {
+                    App.chooseDate('dialnumber');
+                } else if (isIOS) {
+                    appJs.clickDetermine('dialnumber');
                 }
-
 
             })
         }
-        //
     </script>
 </body>
 

@@ -1,16 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- 贝壳充值-android -->
     <meta charset="UTF-8">
     <meta name="viewport"
         content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>贝壳充值</title>
-    <link rel="stylesheet" href="../css/reset.css">
-    <link rel="stylesheet" href="../css/common.css">    
+    <title>贝壳充值-android贝壳充值</title>
+    <link rel="stylesheet" type="text/css" href="../css/reset.css">
+    <link rel="stylesheet"type="text/css" href="../css/common.css">
     <!-- vant ui -->
-    <link rel="stylesheet" href="../css/vant.css">
+    <link rel="stylesheet" type="text/css" href="../css/vant.css">
     <style>
         [v-cloak] {
             display: none !important;
@@ -41,7 +40,7 @@
             <div class="yue">账户余额</div>
             <div>
                 <span class="account_no">{{ account_no }}</span>
-                <span class="font12" style="color:#fff;">贝壳</span>
+                <span class="font12">贝壳</span>
             </div>
         </div>
         <!-- 充值 -->
@@ -74,11 +73,11 @@
         </div>
         <!-- 支付 -->
         <div class="payment pad_15 pay_item" style="padding-top:4px;">
-            <h5>请选择支付方式</h5>
+            <h5>支付方式</h5>
             <div class="pay_type">
                 <div v-for="(item, index) in payOrigin"
                     @click="handlePaytype(index)"
-                    :class="{paySelected:index === payIndex}"
+                    class="paySelected"
                     :key="index">
                     <img :src="item.imgUrl" alt="">
                     <p class="txt_descri">{{ item.txt }}</p>
@@ -88,12 +87,9 @@
         </div>
         <!-- 底部支付 -->
         <div class="footer_pay">
-            <p class="showM">{{ payData.money }}</p>
+            <p class="showM">￥ {{ payData.money }}</p>
             <van-button class="f_pay gradient" @click="goPay" type="default">立即支付</van-button>
-
-            
         </div>
-        
         <!-- 加载中 -->
         <van-loading v-show="showVisible" color="#1989fa" type="spinner" size="48px" vertical>加载中...</van-loading>
         <van-overlay :show="showVisible"  ></van-overlay>
@@ -150,10 +146,10 @@
                 // 支付方式
                 payOrigin:[
                     
-                    // {
-                    //     imgUrl:'img/alipay.png',
-                    //     txt:'支付宝支付'
-                    // },
+                   /* {
+                        imgUrl:'../img/alipay.png',
+                        txt:'支付宝支付'
+                    },*/
                     {
                         imgUrl:'../img/wechatPay.png',
                         txt:'微信支付'
@@ -171,29 +167,39 @@
                 // 收集数据
                 payData:{
                     // 充值金额
-                    money:'',
+                    money:'6.00',
                     // 支付方式 0支付宝 1微信
                     payType:'',
-                },
-                
-
+                }
             },
             created(){
-                // 获取url参数
+                this.getCommonURL();
                 this.account_no = getMoney();
-                // 初始化 money                
-                this.payData.money = '￥'+ this.rechargeNum[0].money
+                console.log( this.account_no);
+                console.log(header_token);
             },
             methods:{
+            	getCommonURL() {
+            	    var url_id = ''
+            	    var commonURL1 = window.location.search;
+            	    //console.log(header_token);
+            	    commonURL1 = commonURL1.slice(1).split('&'); // 285 637需要用到
+            	    for(var item of commonURL1){
+            	        if(item.indexOf('commonURL')>-1){
+            	            url_id = item.split('=')[1]
+            	        }
+            	    }
+            	    commonURL = 'http://'+url_id;
+            	},
                 // 选择具体数量
                 selectMoney(p){
                     this.curIndex = p;
                     this.moneyIsSelect = false;
-                    
+
                     this.inpu_type = 'text';
                     this.otherNum = '其他数量';
                     // 获取数据
-                    this.payData.money = '￥'+ this.rechargeNum[p].money
+                    this.payData.money = this.rechargeNum[p].money
                     
                    
                 },
@@ -213,9 +219,9 @@
                 },
                 writeM(e){
                     if(e.target.value % 10 == 0){
-                        this.payData.money = '￥'+ (e.target.value / 10) +'.00'
+                        this.payData.money =  (e.target.value / 10) +'.00'
                     }else{
-                        this.payData.money = '￥'+ (e.target.value / 10) 
+                        this.payData.money =  (e.target.value / 10)
                     }                                        
                 },
                 // 支付方式
@@ -225,53 +231,56 @@
                 },
                 // 立即支付
                 goPay(){
-                    let copayMoney =  Number(this.payData.money.slice(1));                    
-                    // 判断 支付方式                     
-                    if(this.payData.payType === ''){   
+                    let copayMoney =  Number(this.payData.money);
+                    // 判断 支付方式
+                    /*if(this.payData.payType === ''){
 
                         this.$toast('请选择支付方式');                       
                         return
-                    }
-                    // GP
+                    }*/
                     // 金额大于1元
-                    if(typeof copayMoney != 'number' || copayMoney < 1){
-                        this.$toast('充值金额最少10贝壳');                       
+                     if(typeof copayMoney != 'number' || copayMoney < 1){
+                         this.$toast('充值金额最少10贝壳');
+                         return
+                     }
+                     // 金额小于50000元
+                    if(typeof copayMoney != 'number' || copayMoney > 50000){
+                        this.$toast('充值金额上限50万贝壳');
                         return
                     }
                     // 判断 金额是否符合格式 (整数 )
-                    if(typeof copayMoney != 'number' || copayMoney %1 != 0){
-                        this.$toast('充值金额必须为10的整数倍');                       
-                        return
-                    }
-
+                     if(typeof copayMoney != 'number' || copayMoney %1 != 0){
+                         this.$toast('充值金额必须为10的整数倍');
+                         return
+                     }
                     // 调用支付
                     if(copayMoney == 0){
-                        this.$toast('大哥，选择金额好不好');                       
+                        this.$toast('您好，请选择充值金额');
                         return
                     }
                     // console.log(copayMoney*100) 
                     // console.log(this.payData.payType+1)
                     let param = {
-                        header_token:'0d424657c96f43d395721f1bdbf9cec8',
-                        url: payUlr + '/api/account/rechargeVirtual',
+                        header_token:header_token,
+                        url: commonURL + '/api/account/rechargeVirtual',
                         data: {
                             money:copayMoney*100,
-                            payType:this.payData.payType+1
+                            //payType:this.payData.payType+1
+                            payType:'2',
                         }
                     }
-                    console.log(param)
                     //this.showVisible = true
-                    
-                    // myAjax(param).then(res=>{
+                    myAjax(param).then(res=>{
                         
-                    //     if(res.code == '0000'){
-                    //         this.showVisible = false                                                        
-                    //         window.location.href = res.data.payRequest                                                                                                          
-                    //     }
+                        if(res.code == '0000'){
+                            //this.showVisible = false
+                            window.location.href = res.data.payRequest;
+                           
+                        }
                         
-                    // }).catch(err=>{
-                    //     console.log(err)
-                    // })
+                    }).catch(err=>{
+                        console.log(err)
+                    })
 
                 },
                 

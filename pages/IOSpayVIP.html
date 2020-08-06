@@ -5,11 +5,11 @@
     <meta name="viewport"
         content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>VIPpay-android充值会员</title>
-    <link rel="stylesheet" type="text/css" href="../css/reset.css">
-    <link rel="stylesheet" type="text/css" href="../css/common.css">
+    <title>VIPpay-IOS会员充值</title>
+    <link rel="stylesheet" href="../css/reset.css">
+    <link rel="stylesheet" href="../css/common.css">    
     <!-- vant ui -->
-    <link rel="stylesheet" type="text/css" href="../css/vant.css">
+    <link rel="stylesheet" href="../css/vant.css">
     <style>
         [v-cloak] {
             display: none !important;
@@ -37,13 +37,10 @@
         
         <!-- 顶部 -->
         <div class="pay_gradient pay_vip ">
-            <div class="vip_face"><img :src="userImgUrl" alt=""></div>
+            <div class="vip_face"><img :src="userImgUrl" alt=""/></div>
             <div class="vip_name">
                 <span class="u_name">{{ username }}</span>
-                <div class="u_descri">
-                    <span>{{ isVip }}&nbsp;&nbsp;</span>
-                    <span v-show="showMemberTime">到期日:{{ member_time }}</span>
-                </div>
+                <span class="u_descri">{{ isVip }}</span>
             </div>
 
         </div>
@@ -84,8 +81,7 @@
             <p class="pay_txt">充值成功后，到账可能会有一定延迟，请您耐心等待。</p>
         </div> -->
         <!-- 底部支付 -->
-        <div class="footer_pay vip_pay">
-            <p class="showM">{{ payData.money }}</p>
+        <div class="footer_pay vip_pay">            
             <van-button class="f_pay vip_gradient" @click="goPay" type="default">立即开通</van-button>            
         </div>
         <!-- vip特权 -->
@@ -125,12 +121,17 @@
         let vm = new Vue({
             el: '#payVip',
             data: {
-                username:'',
+                username:'陈平安',
                 userImgUrl:'../img/pic_head.png',
                 isVip:'普通会员',
                 showVisible:false,
-                member_time:'2030-05-25 15:14:59',
-                showMemberTime:true,
+                
+                // 所需后台传递的参数
+                // 100133
+                userid:'',
+                // http://218.201.112.39:6868
+                commonURL:'',
+
                 // 当前选中的index
                 curIndex:0,
                 payIndex:-1,
@@ -160,12 +161,12 @@
                 // 支付方式
                 payOrigin:[
                     
-                   /* {
+                    {
                         imgUrl:'img/alipay.png',
                         txt:'支付宝支付'
-                    },*/
+                    },
                     {
-                        imgUrl:'../img/wechatPay.png',
+                        imgUrl:'img/wechatPay.png',
                         txt:'微信支付'
                     },
                 ],
@@ -199,22 +200,14 @@
                 
 
             },
-            created(){
-                // 获取token
-                this.getToken();
-                this.getCommonURL();
-
-                // 获取url参数
-                this.getVipData();
-                //this.account_no = getMoney();
-                // 初始化 money                
-                
+            created(){                
+                this.getCommonURL();                
+                this.getVipData();                                          
             },
             methods:{
                 // 获取token
                 getToken() {
                     var token_id = ''
-
                     var  header_token1 = window.location.search;
                     header_token1 = header_token1.slice(1).split('&'); // 285 637需要用到
                     for(var item of header_token1){
@@ -224,33 +217,42 @@
                     }
                     header_token = token_id
                 },
-                getCommonURL() {
-                    var url_id = ''
+                // 获取到commonurl 和 userid
+                getCommonURL() {      
+                    let _userid='';
+                    let _commonurl = '';
                     var commonURL1 = window.location.search;
-                    //console.log(header_token);
-                    commonURL1 = commonURL1.slice(1).split('&'); // 285 637需要用到
+                    // ?userid=1111&comingurl=pay.arkcorner.com  ["userid=1111", "comingurl=pay.arkcorner.com"]
+                    commonURL1 = commonURL1.slice(1).split('&'); 
                     for(var item of commonURL1){
-                        if(item.indexOf('commonURL')>-1){
-                            url_id = item.split('=')[1]
+                        // 获取url
+                        if(item.indexOf('comingurl')>-1){
+                            _commonurl = item.split('=')[1]
+                        }
+                        // 获取userid
+                        if(item.indexOf('userid')>-1){
+                            _userid = item.split('=')[1]
                         }
                     }
-                    commonURL = 'http://'+url_id;
+                    this.userid = _userid;
+                    this.commonURL = 'http://'+_commonurl;
+
+
+                    // alert(this.userid);
+                    // alert(this.commonURL);
                 },
                 // 获取数据
                 getVipData(){
-                    // header_token = '6ecca51d19844b76b21bfbcb00246b26';
-                    // commonURL ='http://39.100.106.23:80';
-
                     let param = {
-                        header_token:header_token,
-                        url:commonURL+'/api/custom/getCustomInfo',
-                        
+                        header_token:'',
+                        url:this.commonURL+'/api/custom/checkCustomInfo',
+                        data:{
+                            customid:this.userid
+                        }                        
                     }
-                   this.showVisible = true
-                    myAjax(param).then(res=>{
-                    
-                        if(res.code == '0000'){
-                            console.log(res)                                
+                    this.showVisible = true
+                    myAjax(param).then(res=>{                    
+                        if(res.code == '0000'){                                                                                                          
                             //   名字 会员 头像
                             if(res.data.member_status == 1){
                                 this.isVip = '普通会员'
@@ -259,30 +261,22 @@
                             }
                             this.username = res.data.nickname
                             this.userImgUrl = res.data.headurl
-                            // 处理会员到期日期
-                            let _memberTime = getTimeStap(res.data.member_time);
-
-                            if(showMemberTime(_memberTime)){
-                                this.showMemberTime = true;
-                            }else{
-                                this.showMemberTime = false;
-                            }
-                            let modi_memberDate = new Date(_memberTime).Format("yyyy-MM-dd");
-                            this.member_time = modi_memberDate; //res.data.member_time
                             this.showVisible = false
+                        }else{
+                            this.showVisible = false;
+                            this.$toast(res.data.msg)
                         }
                         
                     }).catch(err=>{
                         console.log(err)
+                        
                     })
                 },
                 // 选择具体数量
                 selectMoney(p){
                     this.curIndex = p;
                     this.moneyIsSelect = false;
-                },                
-                
-                
+                },                             
                 // 支付方式
                 handlePaytype(i){
                     this.payIndex = this.payData.payType= i;
@@ -290,32 +284,32 @@
                 },
                 // 立即支付
                 goPay(){
-                    // console.log(this.curIndex)
-
+                    
                     let _data  = this.vipNum[this.curIndex]
-                    console.log(_data)
+                    // console.log(_data)
                     // console.log(this.vipNum[this.curIndex])
                     let param = {
-                        header_token:header_token,
-                        url: commonURL + '/api/custom/rechargeMember',
+                        reqcustom: this.userid,                        
+                        url: this.commonURL + '/api/custom/rechargeMember',
                         data: {
-                            memberPrice:_data.money*100,
+                            memberPrice:_data.money*100, //this._data.money*100
                             monthNum:_data.month,
                             payType:'2',                            
                         }
                     }
+                    
                     this.showVisible = true
                     
-                    myAjax(param).then(res=>{
-                        
+                    webAjax(param).then(res=>{
+                        // alert(JSON.stringify(res))
                         if(res.code == '0000'){
-                            this.showVisible = false
-                        window.location.href = res.data.payRequest
-                        //this.$toast('开通成功');
-                        this.getVipData()
-                        }else if(res.code == '1011'){
-                        this.$toast('订单已经支付成功');
-                    }
+                            
+                            this.showVisible = false                                                        
+                            window.location.href = res.data.payRequest  ;                                                                                                           
+                        }else{
+                            this.showVisible = false;
+                            this.$toast(res.msg);
+                        }
                         
                     }).catch(err=>{
                         console.log(err)

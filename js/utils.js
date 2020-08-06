@@ -27,6 +27,39 @@ let  payUlr = 'http://58.56.128.226:8088';
 // 封装一个 async await 的 异步函数   header_token: token  url:是具体接口地址 commonUrl + apiUrl  data: 参数列表
 // eg:token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI0Yjc3ZDFlODU4ODk0Y2Y3YWMwZjhlYzM2OWFiNDA0MSJ9.IRinAnnE0e5w5p_lz0g0_E5tKBst4F2Xlm0u3QInCSI'
 // url: /api/travelerInfo/selectTrevelerSchedul
+
+// 处理时间字符串为时间戳 date:'2030-05-25 15:14:59'
+var getTimeStap = function getTimeStap(date){
+    date = date.replace(/-/g, '/');
+    return new Date(date).getTime();
+}
+// 比较后台时间与当前时间，后台大则显示，后台小则不显示
+var showMemberTime = function showMemberTime(dateTime){
+    var currentTime = new Date().getTime();
+    if(currentTime>dateTime){
+        return false;
+    }else{
+        return true;
+    }
+}
+
+// 格式化日期
+
+Date.prototype.Format = function (fmt) { //author: meizz 
+    var o = {
+        "M+": this.getMonth() + 1, //月份 
+        "d+": this.getDate(), //日 
+        "h+": this.getHours(), //小时 
+        "m+": this.getMinutes(), //分 
+        "s+": this.getSeconds(), //秒 
+        "q+": Math.floor((this.getMonth() + 3) / 3), //季度 
+        "S": this.getMilliseconds() //毫秒 
+    };
+    if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+    for (var k in o)
+    if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+    return fmt;
+}
 /**
  * 
  * @param {*} param :header_token url data
@@ -56,8 +89,7 @@ function webAjax(param){
     return new Promise((resolve, reject) => {
         $.ajax({
             headers: {
-                reqcustom: param.reqcustom,
-                
+                reqcustom: param.reqcustom,                
             },               
             contentType: 'application/json',
             type: 'POST',
